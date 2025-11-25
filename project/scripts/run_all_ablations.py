@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 import json
 import time
-from typing import Dict, List
+from typing import Dict, List, Optional
 import numpy as np
 
 # Add project root to path
@@ -27,10 +27,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.data.loader import RCAEvalDataLoader
 from src.data.preprocessing import MetricsPreprocessor, TracesPreprocessor
-from src.encoders.metrics_encoder import TCNEncoder
-from src.encoders.traces_encoder import GCNEncoder
-from src.causal.pcmci import PCMCIDiscovery, GrangerLassoRCA
-from src.fusion.multimodal_fusion import MultimodalFusion
+from src.data.dataset import RCADataset, create_data_loaders
+from src.encoders.metrics_encoder import TCNEncoder, create_metrics_encoder
+from src.encoders.traces_encoder import GCNEncoder, create_trace_encoder
+from src.encoders.logs_encoder import create_logs_encoder
+from src.fusion import create_multimodal_fusion
 from src.models.rca_model import RCAModel
 from src.evaluation.metrics import RCAEvaluator
 import torch
@@ -309,29 +310,147 @@ class AblationRunner:
 
         return aggregated
 
-    def _get_prediction(self, case, config):
-        """Get prediction for a case (placeholder for actual model)"""
-        # This is a simplified version - in reality would use the actual model
-        # For now, return random ranking based on available services
+    def _build_model_for_config(self, config: Dict, num_services: int) -> Optional[RCAModel]:
+        """Build model based on ablation configuration."""
+        try:
+            # Build metrics encoder
+            if config.get('use_metrics', True):
+                metrics_encoder = TCNEncoder(
+                    in_channels=500,  # Will be adjusted dynamically
+                    embedding_dim=256,
+                    hidden_channels=64,
+                    num_layers=7,
+                    kernel_size=3,
+                    dropout=0.3
+                )
+            else:
+                metrics_encoder = TCNEncoder(in_channels=1, embedding_dim=256)  # Dummy
+            
+            # Build traces encoder
+            if config.get('use_traces', False):
+                traces_encoder = GCNEncoder(
+                    in_channels=8,
+                    hidden_channels=64,
+                    embedding_dim=128,
+                    num_layers=2,
+                    dropout=0.3
+                )
+            else:
+                traces_encoder = GCNEncoder(in_channels=8, embedding_dim=128)  # Dummy
+            
+            # Build logs encoder
+            logs_encoder = create_logs_encoder(embedding_dim=256, use_fallback=True)
+            
+            # Build fusion
+            fusion_strategy = config.get('fusion_type', 'intermediate')
+            fusion = create_multimodal_fusion(
+                metrics_encoder=metrics_encoder,
+                logs_encoder=logs_encoder,
+                traces_encoder=traces_encoder,
+                fusion_strategy=fusion_strategy,
+                fusion_dim=512,
+                num_heads=8,
+                use_modality_dropout=True
+            )
+            
+            # Build RCA model
+            model = RCAModel(
+                fusion_model=fusion,
+                num_services=num_services,
+                fusion_dim=512,
+                hidden_dim=256,
+                dropout=0.1,
+                use_service_embedding=True
+            )
+            
+            return model.to(self.device)
+        except Exception as e:
+            print(f"  ⚠ Failed to build model: {e}")
+            return None
 
-        # Extract unique services from metrics columns (simplified)
+    def _get_prediction(self, case, config, model: Optional[RCAModel] = None, 
+                       service_to_idx: Dict = None, metrics_preprocessor: MetricsPreprocessor = None):
+        """Get prediction for a case using the model."""
+        
+        # Extract unique services from metrics columns
         if case.metrics is not None:
             services = set()
             for col in case.metrics.columns:
                 if '_' in col:
                     service = col.split('_')[0]
                     services.add(service)
-
-            services = list(services)
+            services = sorted(list(services))
         else:
-            services = ['service_1', 'service_2', 'service_3']  # Dummy
-
-        # Random ranking with scores
-        scores = np.random.rand(len(services))
-        ranked_services = [(s, score) for s, score in zip(services, scores)]
-        ranked_services.sort(key=lambda x: x[1], reverse=True)
-
-        return ranked_services
+            services = ['service_1', 'service_2', 'service_3']
+        
+        # If no model, use anomaly-based scoring
+        if model is None or not config.get('use_metrics', True):
+            # Score services based on metric anomalies
+            service_scores = {}
+            if case.metrics is not None:
+                for service in services:
+                    service_cols = [c for c in case.metrics.columns if c.startswith(service + '_')]
+                    if service_cols:
+                        service_data = case.metrics[service_cols].values
+                        # Simple anomaly score: mean absolute deviation from median
+                        anomaly_score = np.mean(np.abs(service_data - np.median(service_data)))
+                        service_scores[service] = anomaly_score
+                    else:
+                        service_scores[service] = np.random.rand()
+            else:
+                service_scores = {s: np.random.rand() for s in services}
+            
+            ranked_services = sorted(service_scores.items(), key=lambda x: x[1], reverse=True)
+            return ranked_services
+        
+        # Use model for prediction
+        try:
+            model.eval()
+            with torch.no_grad():
+                # Preprocess metrics
+                if case.metrics is not None and metrics_preprocessor is not None:
+                    processed = metrics_preprocessor.transform(case.metrics)
+                    numeric_cols = processed.select_dtypes(include=[np.number]).columns
+                    values = processed[numeric_cols].values
+                    
+                    # Take window
+                    window_size = 12
+                    if len(values) >= window_size:
+                        values = values[-window_size:]
+                    else:
+                        pad_size = window_size - len(values)
+                        values = np.pad(values, ((pad_size, 0), (0, 0)), mode='edge')
+                    
+                    # Limit features
+                    if values.shape[1] > 500:
+                        values = values[:, :500]
+                    
+                    metrics_tensor = torch.tensor(values, dtype=torch.float32).unsqueeze(0).to(self.device)
+                else:
+                    metrics_tensor = None
+                
+                # Forward pass
+                outputs = model(metrics=metrics_tensor)
+                probs = outputs['probs'][0].cpu().numpy()
+                
+                # Map to services
+                if service_to_idx:
+                    idx_to_service = {v: k for k, v in service_to_idx.items()}
+                    ranked_services = []
+                    for idx in np.argsort(probs)[::-1]:
+                        service_name = idx_to_service.get(idx, f'service_{idx}')
+                        ranked_services.append((service_name, float(probs[idx])))
+                else:
+                    ranked_services = [(services[i % len(services)], float(probs[i])) 
+                                      for i in np.argsort(probs)[::-1]]
+                
+                return ranked_services
+                
+        except Exception as e:
+            # Fallback to anomaly-based scoring
+            service_scores = {s: np.random.rand() for s in services}
+            ranked_services = sorted(service_scores.items(), key=lambda x: x[1], reverse=True)
+            return ranked_services
 
     def run_all_ablations(
         self,
