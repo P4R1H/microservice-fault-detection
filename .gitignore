@@ -1,0 +1,99 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Data files - DO NOT COMMIT DATASETS
+data/
+!project/src/data/  # Exception: keep source code in src/data/
+*.csv
+*.zip
+*.tar.gz
+*.h5
+*.pkl
+*.pickle
+
+# Model checkpoints and outputs (but not src/models/ source code)
+/models/
+/checkpoints/
+/outputs/
+/runs/
+/logs/
+*.pt
+*.pth
+*.ckpt
+*.pth
+*.ckpt
+*.safetensors
+
+# Experiments and results
+experiments/
+wandb/
+mlruns/
+
+# Workspace tracking (keep tracked, but ignore temp files)
+.workspace/experiments/
+.workspace/*.tmp
+.workspace/*.bak
+
+# Cache
+.cache/
+*.log
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Project specific
+project/data/
+project/outputs/
+project/experiments/
+project/models/
+project/checkpoints/
+project/logs/
+project/wandb/
+
+# Config overrides (keep defaults tracked)
+project/config/*_override.yaml
+project/config/local_*.yaml
+
+# Archived files
+.archive/

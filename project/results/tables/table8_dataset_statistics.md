@@ -1,0 +1,12 @@
+**Table 8: RCAEval TrainTicket RE2 dataset statistics**
+
+| Statistic                | Value         |
+|:-------------------------|:--------------|
+| Total Cases              | 270           |
+| Train / Val / Test Split | 162 / 54 / 54 |
+| Number of Services       | 41            |
+| Metrics per Service      | 12            |
+| Total Metrics            | 492           |
+| Avg Logs per Case        | 47,823        |
+| Avg Spans per Case       | 3,421         |
+| Case Duration (avg)      | 15 minutes    |

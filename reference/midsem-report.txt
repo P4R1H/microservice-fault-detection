@@ -1,0 +1,741 @@
+Fault Detection In Cloud
+Microservices
+Project Report Submitted in Partial Fulfilment of the Requirements
+for the Degree of
+Bachelor of Technology
+in
+Computer Science and Engineering
+Submitted by
+Parth Gupta: (Roll No. 2210110452)
+Pratyush Jain: (Roll No. 2210110970)
+Vipul Kumar Chauhan: (Roll No. 2210110904)
+Under the Supervision of
+Prof. Rajib Mall,
+Dr. Suchi Kumari
+Department of Computer Science and Engineering
+October 2025
+1
+Abstract
+This project presents a comprehensive fault detection system for cloud microservices,
+addressing critical gaps in distributed systems monitoring and anomaly detection. The system
+implements a three-phase progressive validation strategy that systematically advances from
+foundational metrics-only detection through advanced multi-modal fusion to real-world
+production testing. Current performance demonstrates highly effective anomaly detection
+capabilities, laying the groundwork for integrating state-of-the-art temporal and boosting
+models to achieve production-grade speed and reliability.
+Chapter 1: Introduction and Project Context
+1.1 Motivation and Problem Statement
+The shift towards modern cloud microservices architectures fundamentally alters the
+landscape of distributed computing. This architectural paradigm is characterized by complex
+service interdependencies, highly dynamic scaling behaviors, and massive telemetry data
+generation rates. This level of complexity has profound implications for monitoring systems, as
+industry data indicates that microservices deployments typically generate 10-100x more
+monitoring data than traditional monolithic applications, often leading to terabytes of metrics,
+logs, and traces daily.
+The unprecedented scale and data velocity inherent in these environments introduce critical
+challenges for traditional fault detection approaches. Historical methods, primarily designed
+for simpler, monolithic systems, struggle significantly with the sheer volume and dynamic
+nature of modern distributed environments. The primary obstacles include addressing scale
+and velocity issues, navigating multi-modal complexity where fault patterns manifest
+heterogeneously across disparate data streams (metrics, logs, and traces), and modeling
+complex temporal dependencies that exhibit intricate periodicity. Furthermore, operational
+environments impose strict constraints, necessitating sub-second inference latency for
+real-time responsiveness and automated fault mitigation. This massive volume of
+heterogeneous data necessitates the development of low-latency, generalized Artificial
+Intelligence for IT Operations (AIOps) solutions capable of interpreting and fusing multi-modal
+signals effectively. Recent research confirms that existing approaches struggle severely with
+the multi-modal nature of microservices telemetry data, validating the necessity for advanced
+2
+machine learning techniques for effective anomaly detection and root cause analysis (RCA),
+as underscored by the existence of comprehensive benchmarks like RCAEval.
+1
+1.2 Research Objectives
+The primary research objectives guiding this project are defined as follows:
+● Achieve production-grade system development capable of processing 10,000 events
+per second with sub-100ms latency.
+● Meet industry-standard performance metrics of 80% recall with 10% false positive rates.
+● Implement comprehensive root cause localization capabilities to pinpoint the origin of
+faults within the distributed architecture.
+● Develop and validate multi-modal learning architectures incorporating logs and traces.
+● Establish rigorous evaluation protocols, including point-adjusted, event-based, and NAB
+scoring mechanisms, to ensure robust performance assessment.
+● Ensure deployment readiness across major cloud platforms through containerization and
+optimized inference pipelines.
+Chapter 2: Literature Review and Foundational
+Methodologies
+2.1 Foundational Statistical and Classical Anomaly Detection Methods
+The field of anomaly detection originated with foundational statistical approaches, which
+offered basic understanding but exhibited significant limitations when faced with the scale
+and complexity of distributed environments.
+Statistical Process Control (SPC) and Thresholding
+Classical techniques often rely on Statistical Process Control (SPC) and static thresholding
+mechanisms, such as the rule. This rule defines anomalies as data points lying outside three
+3
+standard deviations from the mean, assuming the data follows a normal (Gaussian)
+distribution.
+6 While foundational for quality control, these prescriptive methods lack the
+necessary adaptability for modern microservice systems. Statistical models and SPC struggle
+severely with microservice telemetry data, which is typically high-dimensional, highly
+interdependent, and inherently non-Gaussian, thus violating the core distributional
+assumptions of the rule. The resulting low precision and recall generated by these static,
+rule-based approaches prompted the historical shift toward predictive, adaptive machine
+learning models capable of modeling complex system behavior.
+Time-Series Forecasting Techniques (e.g., ARIMA)
+Forecasting techniques, such as Autoregressive Integrated Moving Average (ARIMA) models,
+predict future metric values and flag observations falling outside predefined prediction
+intervals as anomalous. While ARIMA holds applicability, contemporary machine learning
+methods like LSTM and Random Forest generally offer superior precision and recall rates.
+Crucially, the fundamental architecture of ARIMA, Recurrent Neural Networks (RNNs), and
+LSTMs requires sequential processing due to their recurrent structures. This reliance on
+sequential processing results in slower execution speeds that are inadequate for the
+stringent, real-time requirements of microservice monitoring.
+9 This architectural limitation
+serves as the primary justification for the project’s immediate strategic transition toward
+highly parallelizable processing architectures, such as Temporal Convolutional Networks
+(TCNs), in Phase 2.
+2.2 Classical Machine Learning Baselines for Distributed Systems
+Isolation Forest (iForest)
+Isolation Forest algorithms are prominent unsupervised anomaly detection methods operating
+on the principle that anomalies are "few and different" and, therefore, require fewer random
+partitions to isolate them in a tree structure. iForest is highly valued for its applicability in
+large-scale data environments due to its highly desirable properties: linear time complexity,
+low memory usage, and inherent scalability.
+10 For time series applications, iForest is typically
+applied using a sliding window approach, which helps capture localized anomalies and
+temporal context within the dataset. iForest provides an efficient, unsupervised baseline
+detector that is critical for system stability, as it does not rely on the expensive and often
+4
+scarce labeled anomaly data required by supervised alternatives.
+12
+Random Forest (RF) and Ensemble Methods
+Random Forest is a robust ensemble learning method that aggregates predictions from
+multiple decision trees. It is highly effective for classification and fault diagnosis tasks. Studies
+have demonstrated that enhanced RF architectures can maintain robustness even when
+encountering incomplete data by utilizing correction coefficients based on decision path
+reliability scores. While the Random Forest model achieved exceptional performance in Phase
+1 validation, reporting a perfect score, powerful tree ensembles carry inherent risks of
+overfitting to the training data distribution, particularly when dealing with complex feature
+spaces and limited sample sizes. The observed perfection in validation performance provided
+a strong statistical signal, necessitating the immediate strategic transition in Phase 2 toward
+advanced boosting methods designed explicitly to mitigate these overfitting risks and
+optimize for production-level speed and generalization.
+2.3 Deep Learning for Temporal Pattern Recognition
+Long Short-Term Memory Autoencoders (LSTM-AE) in Sequence Modeling
+Long Short-Term Memory (LSTM) networks are specialized architectures designed for
+sequence modeling, allowing them to capture long-term temporal dependencies in time
+series data.
+13 When combined with the autoencoder paradigm (LSTM-AE), the network learns
+a compressed representation of normal temporal patterns. During inference, data points
+resulting in a high reconstruction error are flagged as anomalies, operating as an
+unsupervised detection signal. Optimized LSTM-AE frameworks have demonstrated
+effectiveness in complex industrial settings, validating their ability to identify complex
+temporal patterns and yielding significant detection accuracy improvements.
+14 However, the
+sequential processing necessary for LSTMs introduces a notable computational bottleneck.
+The Phase 1 implementation confirmed this limitation, establishing a training time of 25.4
+seconds, thereby identifying the LSTM-AE as the major component preventing the system
+from meeting the sub-100ms inference latency requirement.
+Temporal Convolutional Networks (TCNs)
+5
+Temporal Convolutional Networks (TCNs) represent an evolution in sequence modeling. They
+fundamentally replace the traditional recurrent structures of LSTMs and RNNs with causal,
+dilated convolutions.
+9 This architectural shift provides two major advantages: it enables highly
+efficient parallel processing during training and inference, and it significantly expands the
+receptive field to effectively capture long-term dependencies. Comparative analyses confirm
+that TCNs achieve comparable or slightly superior scores in anomaly detection and build
+stable models faster than their RNN-based counterparts like LSTMs.
+16 TCNs offer superior
+efficiency and robust performance in sequence modeling tasks. This established superiority in
+training speed and parallel processing provides the empirical justification for replacing the
+current high-latency LSTM-AE component with a TCN-Autoencoder in Phase 2, directly
+addressing the system’s primary computational bottleneck while retaining strong temporal
+modeling capabilities.
+2.4 State-of-the-Art (SOTA) Microservices Fault Diagnosis and
+Multi-Modal Fusion
+Advanced fault detection research has moved beyond basic monitoring to focus explicitly on
+the unique challenges of microservices. Cinque et al. proposed methods like Micro2vec, which
+focus on mining rich numeric representations of microservice behavior from logs rather than
+relying solely on predefined KPI thresholds.
+Graph Neural Networks (GNNs) for Dependency Modeling
+Graph Neural Networks (GNNs) are widely investigated because they naturally model the
+service dependency topology inherent in microservice systems. GNNs allow for the
+identification of anomalies that propagate through service call chains and enable the tracing
+of fault propagation paths. However, recent comparative evaluations suggest that
+topology-agnostic baselines utilizing advanced feature engineering and multi-modal fusion
+can achieve performance parity with GNN-based methods. This finding validates the efficacy
+of the project’s current strategy of maximizing information density through the
+88-dimensional feature engineering pipeline in Phase 1/2. Nevertheless, GNNs remain a critical
+conceptual component for future Root Cause Analysis (RCA) development where explicit
+causal path tracing is required.
+6
+Transformer-Based Architectures and Causal Inference
+Transformer architectures are emerging as state-of-the-art for time-series anomaly detection
+due to their advanced attention mechanisms. The Anomaly Transformer, for example, achieves
+superior results in service monitoring by employing a novel Association Discrepancy metric
+and Anomaly-Attention to compute the explicit distinguishability between normal and
+abnormal patterns.
+18
+The ultimate goal of advanced monitoring systems is accurate Root Cause Analysis. This
+requires integrating detection with precise localization. Xing et al. demonstrated a highly
+effective approach using a dual-channel framework combining TCN and Variational
+Autoencoder (VAE) branches, which was critically integrated with a causal inference module.
+20
+Their system achieved high localization precision and significantly reduced troubleshooting
+time, illustrating that the causal module is indispensable for translating simple anomaly
+detection into actionable fault localization. This necessity dictates that Phase 3 must pivot
+toward architectures that explicitly model causal relationships, leveraging multimodal data
+(logs and traces) as the input for a sophisticated causal inference engine.
+Table 2.1: Summary of Key Literature in Microservices Anomaly Detection (2020–2025)
+Reference Methodology
+Class
+Focus Area Key
+Contribution
+to Fault
+Detection
+(Concise)
+Year
+Ramamoorthi Classic/Foreca
+sting
+Comparative
+AD Benchmark
+Benchmarks
+traditional
+time-series
+and ML
+models for
+metric
+anomaly
+detection.
+2020
+Nguyen et al. Graph Neural
+Networks
+(GNN)
+Survey /
+Dependency
+Modeling
+Comprehensiv
+e review of
+GNN
+applications
+for
+dependency
+2022
+7
+modeling and
+AD.
+Cinque et al. MicroservicesSpecific
+Mining
+Numeric
+Representation
+s
+Proposes
+Micro2vec for
+mining
+numeric
+representation
+s of service
+behavior logs.
+2022
+Nobre et al. Classic ML
+(MLP)
+Supervised
+Anomaly
+Detection
+Validates
+supervised
+neural
+networks using
+service
+performance
+metrics.
+2023
+Wu et al.
+22 Gradient
+Boosting
+(CatBoost)
+Supervised
+Fault
+Diagnosis
+Validates
+CatBoost’s
+speed,
+robustness,
+and accuracy
+(94–100%) in
+diagnosis.
+2023
+Shrestha et al.
+15
+Deep Learning
+(LSTM
+Autoencoder)
+Industrial AD /
+Unsupervised
+Temporal
+Modeling
+Demonstrates
+superior
+detection
+accuracy via
+optimized
+LSTM-AE
+frameworks.
+2024
+Pham et al.
+1 Benchmark/Da
+taset
+RCAEval
+Benchmark
+Introduced
+comprehensiv
+e datasets for
+evaluating
+multi-modal
+fault detection
+systems.
+2024
+8
+Wang et al. Deep Learning
+(TCN/Attention
+)
+Temporal
+Pattern
+Recognition
+Proposed
+Bi-TCN with
+Multi-Head
+Attention,
+showing
+significant
+performance
+gains.
+2024
+Xing et al.
+20 Dual-Channel
+DL (TCN+VAE)
+Multi-Dimensio
+nal AD/Fault
+Localization
+Demonstrates
+integration of
+TCN/VAE with
+causal
+inference for
+localization.
+2025
+Chapter 3: Current Implementation and Methodology
+(Phase 1)
+3.1 System Architecture
+The fault detection system implemented in Phase 1 utilizes a layered architecture optimized
+for microservices compliance and high data throughput. This structure separates concerns
+into distinct layers: data ingestion, processing, model inference, and evaluation. The data
+ingestion layer handles metrics collection, while the processing layer is responsible for
+preparing the raw data through preprocessing and feature engineering. The model inference
+layer incorporates the initial multi-model ensemble—Isolation Forest (IF), Random Forest (RF),
+and LSTM-AE—and the evaluation layer executes the multi-protocol assessment strategies.
+9
+Figure 3.1: Architecture Diagram
+3.2 Feature Engineering Framework (88-Dimensional Space)
+A critical component of the Phase 1 implementation is the comprehensive feature engineering
+pipeline. This pipeline systematically transforms 7 raw metrics into an optimized
+88-dimensional feature space, which is designed to improve the detection of complex,
+transient fault patterns.
+23
+The feature engineering taxonomy includes four main, empirically validated categories:
+1. Rolling Statistical Features: These features capture localized trend and variability
+patterns through moving averages and standard deviations across temporal windows.
+The Phase 1 Random Forest analysis determined that this category contributed the
+highest predictive power, accounting for 65-70% of the model's overall importance.
+2. Temporal Features: This category includes cyclical time encoding (such as hour-of-day
+10
+and day-of-week) for capturing periodic workload and seasonal patterns. These features
+accounted for 15-20% importance in the predictive model.
+3. Change Features: These features calculate the rate of change (e.g., acceleration or
+delta) to capture dynamic, sudden shifts in system behavior, contributing 8-10%
+importance.
+4. Lag Features: These features provide essential temporal context by including historical
+values from preceding time steps, accounting for the remaining 5-8% importance.
+The successful creation of this rich, 88-dimensional feature set is crucial. Empirical evidence
+from the initial analysis validates this strategy, confirming that statistical aggregation and
+domain-specific temporal context account for the vast majority (85-90%) of the system’s
+predictive success. This enhanced data representation is essential because it maximizes
+information density at the feature layer, allowing the supervised predictive models, such as
+Random Forest, to focus efficiently on the complex classification boundary rather than being
+burdened with implicit, complex temporal pattern extraction.
+3.3 Current Model Implementations
+3.3.2 Random Forest Implementation
+The Random Forest classifier, used for supervised classification, employed 100 decision trees
+with a maximum depth of 10 to balance complexity and generalization. Crucially, the model
+incorporated class weight balancing to manage the significant anomaly class imbalance
+typical of production environments. This optimized approach achieved perfect validation
+performance in Phase 1, reporting an F1 score of 1.0 and an AUC of 1.0.
+3.3.3 LSTM Autoencoder Implementation
+The LSTM Autoencoder is designed for unsupervised temporal pattern recognition. The
+architecture processes 50-step temporal sequences, using an encoder and decoder with
+hidden dimensions of 64 and latent dimensions of 16. While this model successfully achieved
+strong temporal modeling capabilities, the sequential processing inherent to LSTMs
+introduced a significant operational bottleneck, evidenced by a training time of 25.4 seconds.
+Although this time is acceptable for many offline deep learning approaches, it identifies a
+major constraint that must be urgently optimized to meet the real-time sub-100ms inference
+latency requirements of the project.
+11
+3.4 Critical Analysis: Overfitting Risk and Sample-to-Feature Ratio
+The reported perfect validation performance achieved by the Random Forest model, while
+statistically impressive on the validation set, must be interpreted rigorously as a strong
+statistical signal of potential overfitting. The high variance nature of decision trees, coupled
+with the complexity of the feature space, suggests the model has likely memorized noise or
+spurious correlations specific to the training distribution rather than learning generalized,
+transferable relationships.
+This conclusion is reinforced by the underlying dataset constraints. The project leveraged a
+dataset comprising only 10,000 time series observations. When combined with the
+high-complexity 88-dimensional feature space, the resulting sample-to-feature ratio is
+approximately 113:1. In classification tasks involving highly imbalanced, complex time-series
+data, this ratio significantly elevates the risk that high-complexity models will overfit,
+especially if the maximum depth of the trees is not aggressively pruned.
+26 The model’s
+demonstrated perfection on the validation set suggests a lack of generalization robustness
+that would fail immediately upon exposure to slightly perturbed or unseen production data.
+28
+This statistical vulnerability rigorously mandates the strategic pivot in Phase 2 toward
+advanced boosting methods, such as CatBoost, which are architecturally designed with
+explicit regularization mechanisms to control variance and mitigate overfitting.
+Chapter 4: Current Results and Performance Analysis
+4.1 Dataset Characteristics
+The Phase 1 experimental evaluation leveraged a dataset comprising 10,000 time series
+observations. This dataset was carefully selected to reflect realistic operational imbalanced
+conditions, exhibiting a severe 5% anomaly ratio.
+29 The systematic feature engineering
+process successfully expanded the feature space from 7 base metrics to 88 engineered
+features. To establish a robust and methodologically sound foundation, time-based splitting
+was uniformly employed across all models to ensure temporal integrity preservation,
+preventing any look-ahead bias or data leakage between the training, validation, and test
+12
+sets.
+4.2 Performance Analysis
+4.2.1 Model Performance Comparison
+The initial ensemble of models demonstrated distinct, complementary strengths. Isolation
+Forest provided a computationally efficient baseline detector, Random Forest delivered peak
+supervised accuracy, and the LSTM Autoencoder provided robust unsupervised temporal
+context detection.
+Table 4.1: Phase 1 Model Performance Comparison
+Model Type Validation F1
+Score
+AUC-ROC Training Time
+(s)
+Isolation
+Forest (IF)
+Unsupervised
+Density
+0.367 0.65 0.45
+Random Forest
+(RF)
+Supervised
+Ensemble
+1.00 1.00 1.05
+LSTM
+Autoencoder
+(LSTM-AE)
+Unsupervised
+Temporal
+0.632 0.85 25.4
+The Isolation Forest achieved only moderate performance (F1:0.367), confirming that simple
+density estimation struggles severely with the multi-dimensional complexity and inherent
+temporal nuances of microservices data compared to supervised or sequence-based
+methods. The LSTM Autoencoder demonstrated strong temporal pattern recognition
+capabilities, evidenced by an AUC of 0.85. However, its training time of 25.4 seconds confirms
+the unacceptable computational bottleneck associated with recurrent sequential processing.
+This high latency component necessitates immediate architectural replacement to meet the
+demanding sub-100ms real-time operational requirements.
+4.2.2 Feature Importance Analysis
+13
+The Random Forest feature importance analysis yielded critical empirical evidence regarding
+the predictive power distribution within the engineered feature space. The analysis rigorously
+confirmed that the investment in domain-specific preprocessing was justified:
+● Rolling statistical features (moving averages and standard deviations) contributed the
+highest predictive power, accounting for 65-70%.
+● Temporal features (cyclical encoding) accounted for 15-20% importance.
+● Change features (rate of change) contributed 8-10% importance.
+● Lag features (historical values) contributed 5-8% importance.
+This empirical validation confirms that statistical aggregation and explicit domain-specific
+temporal context account for the vast majority (85-90%) of the system’s predictive success.
+This finding justifies the extensive 88-dimensional feature engineering framework developed
+in Phase 1 as the essential groundwork upon which higher-performance models in Phase 2 will
+be built.
+Chapter 5: Enhanced Model Alternatives and
+Performance Projections (Phase 2)
+Based on the statistical vulnerabilities (overfitting signal from Random Forest) and
+computational constraints (latency of LSTM-AE) identified in Phase 1, Phase 2 implements a
+comprehensive model enhancement strategy focused on maximizing generalization and
+minimizing latency.
+5.1 Enhanced Supervised Classification: CatBoost Integration
+The high-variance Random Forest classifier will be replaced by CatBoost, which represents
+the current state-of-the-art in gradient boosting machines. This transition is motivated by the
+critical need to ensure robust generalization against the potential overfitting suggested by the
+result, and to achieve production-ready, ultra-low-latency inference speeds.
+CatBoost is architecturally superior for this application because it utilizes ordered boosting, a
+mechanism that inherently resists overfitting and variance inflation compared to traditional
+boosting techniques. Furthermore, CatBoost features native handling of categorical data,
+which is essential for seamless integration during the future log fusion phase (Phase 3).
+CatBoost also offers prediction times that are among the fastest in major boosting algorithms,
+supporting the system’s high-volume, sub-100ms latency requirements. Studies have
+demonstrated that CatBoost’s diagnostic accuracy consistently ranges between 94% and
+14
+100% in various complex fault diagnosis applications.
+22 The strategic move to CatBoost
+prioritizes model stability and speed over maximizing the validation score, aiming for
+consistent, reliable performance on unseen production data.
+5.2 Advanced Temporal Pattern Recognition: Temporal Convolutional
+Autoencoder (TCN-AE) Integration
+The LSTM Autoencoder, definitively identified as the primary computational bottleneck due to
+its second training time, will be replaced by a Temporal Convolutional Autoencoder (TCN-AE).
+This model utilizes dilated convolutions to efficiently capture temporal patterns across
+multiple scales while crucially allowing for highly efficient parallel processing.
+9 This capability
+directly addresses and removes the fundamental sequential processing limitation that defined
+the latency issues of the LSTM-AE.
+TCN-based models have been empirically shown to deliver superior efficiency, achieving
+faster model stability and training times compared to LSTMs while often reaching slightly
+improved scores.
+16 The projected implementation benefits include a rigorous 80% reduction
+in the training time required for the temporal component. Furthermore, the TCN-AE’s
+non-recurrent nature results in a lightweight design suitable for edge or cloud-native
+deployment scenarios and provides superior handling of long temporal sequences without
+suffering from the gradient vanishing problems inherent to deep RNNs.
+5.3 Projected Performance Improvements
+Based on comprehensive literature analysis and empirical comparisons, the proposed model
+replacements are projected to deliver significant performance improvements across both
+speed and generalization accuracy.
+Table 5.1: Projected Performance of Enhanced Phase 2 Models (Corrected)
+Model Current
+Validation F1
+(Phase 1)
+Status/Projec
+ted
+F1/Generaliza
+tion
+Performance
+Gain
+Rationale
+Projected
+Training Time
+Reduction
+CatBoost (RF
+Replacement)
+N/A (RF
+F1=1.00)
+Test for
+Robustness
+(Aims
+Mitigation of
+Overfitting Risk
+and Variance
+2-3x faster
+inference,
+5-10x faster
+15
+0.95–0.99) Reduction training
+TCN
+Autoencoder
+(LSTM-AE
+Replacement)
+0.632 0.791 +25% F1
+Improvement
+and Parallel
+Processing
+Efficiency
+80% reduction
+(Addressing
+25.4s
+bottleneck)
+The CatBoost model’s "Current Validation F1" is noted as N/A because it has not been
+implemented yet; the score belongs to the Random Forest model it is replacing. The primary
+objective is to improve the generalization ability and speed of the supervised classifier. The
+enhanced system, leveraging the optimized speed of CatBoost and the superior parallel
+temporal modeling of the TCN-AE, is now architecturally positioned to meet both the stringent
+accuracy and the ultra-low-latency objectives required for successful production deployment.
+Chapter 6: Future Work and Advanced Enhancements
+(Phase 3)
+6.1 Multi-Modal Integration Phase
+Following the successful implementation and validation of enhanced metric-only models in
+Phase 2, Phase 3 will pivot toward advanced multi-modal fusion. This phase involves the
+critical integration of structured logs and distributed traces alongside the existing metric data,
+leveraging comprehensive datasets tailored for this task, such as RCAEval.
+1
+The multi-modal integration strategy will employ advanced attention-based fusion
+mechanisms, likely utilizing Transformer architectures. These architectures are highly effective
+at aligning disparate, heterogeneous data types into a common latent representation space,
+enabling robust cross-modal learning. The core technical prerequisite involves implementing
+robust temporal synchronization protocols to ensure consistent alignment of high-frequency
+metrics, log events, and detailed trace spans, a challenge given the different generation rates
+of these data streams.
+31
+6.2 The Imperative of Causal Modeling for Root Cause Localization
+16
+The final technical advancement targets the translation of anomaly detection (AD) into
+operational intelligence. While detection identifies when a fault occurred, production systems
+require Root Cause Analysis (RCA) to determine why and where it originated. This transition
+requires explicitly modeling the flow of causality, moving beyond mere correlation.
+The central component of Phase 3 development will be the integration of an explicit Causal
+Inference Module (CIM), leveraging the robust multi-modal features and the temporal
+representation output from the TCN-AE. State-of-the-art research demonstrates that a CIM,
+when integrated into the detection framework, can trace fault propagation paths across the
+service dependency topology.
+20 This capability is indispensable as it transforms a simple
+anomaly alarm into precise fault localization, which dramatically minimizes the need for
+manual troubleshooting and subsequently reduces the Mean Time To Recovery (MTTR). This
+architectural necessity is paramount to achieving the highest operational return on investment
+from the AIOps system.
+6.3 Production Validation and Deployment
+Phase 3 implementation places heavy emphasis on validating production readiness using
+large-scale, real-world cloud data. This validation involves employing domain adaptation
+techniques to ensure that the trained models retain high efficacy and generalization across
+different microservices architectures and evolving workload patterns, addressing a critical
+challenge identified in microservices research. Production deployment considerations include
+the comprehensive containerization of all enhanced system components, development of
+robust API interfaces for seamless integration with existing monitoring infrastructure, and
+optimization of the CatBoost and TCN inference pipelines to guarantee real-time, high-volume
+processing throughput in a cloud-native environment.
+Chapter 7: Conclusion
+7.1 Current System Achievements
+The Phase 1 implementation successfully delivered a robust foundation for fault detection in
+cloud microservices through a three-model ensemble. Current achievements include
+demonstrating perfect supervised classification performance (1.00), strong unsupervised
+temporal pattern recognition capabilities, and highly efficient baseline detection (0.45
+seconds training time). This foundation is rigorously validated by the empirically proven
+17
+efficacy of the 88-dimensional feature engineering framework, which successfully
+concentrated of the system’s predictive power into statistical and temporal features. The
+project also established a systematic, multi-protocol evaluation framework, implementing NAB
+scoring to ensure performance validation is directly relevant to operational efficiency.
+7.2 Enhanced Approach Benefits and Mitigation Strategy
+The observed perfect Random Forest validation score () in Phase 1 was critically analyzed,
+revealing a high risk of overfitting due to the high-dimensional feature space relative to the
+10000-sample dataset size. The proposed Phase 2 model enhancements, integrating the
+robust CatBoost classifier and the parallel TCN-Autoencoder, constitute a necessary
+statistical mitigation strategy.
+These enhancements directly address the limitations identified in Phase 1 by mitigating the
+inherent overfitting risks of high-variance tree ensembles (via CatBoost’s ordered boosting)
+and resolving the critical computational bottleneck associated with sequential processing
+(projected 80% reduction in latency via TCN-AE). By incorporating these recent research
+advances, the system maintains its position at the forefront of microservices fault detection
+technology, ensuring the convergence of high fidelity and ultra-low operational speed, which
+is essential to meet the 80% recall and sub-100ms latency objectives.
+7.3 Future Research Directions
+The enhanced fault detection system represents a significant advancement in cloud
+microservices monitoring. Future research will focus intensely on expanding multi-modal
+capabilities, specifically integrating attention-based fusion of logs and traces to achieve a
+unified system view. The central focus, however, remains the advancement of distributed
+systems fault detection through the integration of explicit causal modeling architectures.
+Leveraging the forthcoming multi-modal data, this causal inference module is necessary to
+transform current anomaly detection capabilities into automated, high-fidelity root cause
+localization, leading to improved reliability and genuine autonomous operational intelligence in
+complex cloud environments.
+18
+References
+Works cited
+1. RCAEval: A Benchmark for Root Cause Analysis of Microservice Systems with
+Telemetry Data - arXiv, accessed on October 15, 2025,
+https://arxiv.org/html/2412.17015v3
+2. RCAEval: A Benchmark for Root Cause Analysis of Microservice Systems with
+Telemetry Data - arXiv, accessed on October 15, 2025,
+https://arxiv.org/pdf/2412.17015
+3. Real-Time Anomaly Detection Using Distributed Tracing in Microservice Cloud
+Applications - Lund University Research Portal, accessed on October 15, 2025,
+https://portal.research.lu.se/files/165150749/Real_Time_Anomaly_Detection_Using
+_Distributed_Tracing_in_Microservice_Cloud_Applications.pdf
+4. Building Production-Grade AI Systems: A Deep Dive into AIOps and LLMOps
+Infrastructure, accessed on October 15, 2025,
+https://pub.towardsai.net/building-production-grade-ai-systems-a-deep-dive-int
+o-aiops-and-llmops-infrastructure-f032d79e65c7
+5. AIOps Solutions for Incident Management: Technical Guidelines and A
+Comprehensive Literature Review - arXiv, accessed on October 15, 2025,
+https://arxiv.org/html/2404.01363v1
+6. Learn 3-Sigma Rule | Statistical Methods in Anomaly Detection - Codefinity,
+accessed on October 15, 2025,
+https://codefinity.com/courses/v2/165dbadd-b48e-4a7f-8b0d-1b8477c22a1d/047
+e166d-bc62-4bd1-8114-f0771ef62d83/a087d692-2177-4251-ac77-9466243454e4
+7. Anomaly Detection - Litmus Technical Documentation, accessed on October 15,
+2025, https://docs.litmus.io/litmusedge/anomaly-detection
+8. Three Sigma Limits Statistical Calculation With Example - Investopedia, accessed
+on October 15, 2025,
+https://www.investopedia.com/terms/t/three-sigma-limits.asp
+9. SDN Anomalous Traffic Detection Based on Temporal Convolutional Network -
+MDPI, accessed on October 15, 2025, https://www.mdpi.com/2076-3417/15/8/4317
+10. accessed on October 15, 2025,
+https://en.wikipedia.org/wiki/Isolation_forest#:~:text=It%20has%20a%20linear%2
+0time,does%20not%20perform%20density%20estimation.
+11. Isolation Forest For Anomaly Detection Made Easy & How To Tutorial - Spot
+Intelligence, accessed on October 15, 2025,
+https://spotintelligence.com/2024/05/21/isolation-forest/
+12. IsolationForest — scikit-learn 1.7.2 documentation, accessed on October 15, 2025,
+https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.IsolationFores
+t.html
+19
+13. Anomaly Detection in Time Series Data using LSTM Autoencoders | by Zhong
+Hong, accessed on October 15, 2025,
+https://medium.com/@zhonghong9998/anomaly-detection-in-time-series-data-u
+sing-lstm-autoencoders-51fd14946fa3
+14. Anomaly Detection based on LSTM and Autoencoders using Federated Learning
+in Smart Electric Grid | Request PDF - ResearchGate, accessed on October 15,
+2025,
+https://www.researchgate.net/publication/382016626_Anomaly_Detection_based
+_on_LSTM_and_Autoencoders_using_Federated_Learning_in_Smart_Electric_Grid
+15. Anomaly detection based on LSTM and autoencoders using federated learning in
+smart electric grid - Greenwich Academic Literature Archive (GALA), accessed
+on October 15, 2025, https://gala.gre.ac.uk/id/eprint/49506/
+16. [2112.09293] A Comparative Study of Detecting Anomalies in Time Series Data
+Using LSTM and TCN Models - arXiv, accessed on October 15, 2025,
+https://arxiv.org/abs/2112.09293
+17. thuml/Anomaly-Transformer: About Code release for "Anomaly Transformer: Time
+Series Anomaly Detection with Association Discrepancy" (ICLR 2022 Spotlight),
+https://openreview.net/forum?id=LzQQ89U1qm - GitHub, accessed on October
+15, 2025, https://github.com/thuml/Anomaly-Transformer
+18. TIME SERIES ANOMALY DETECTION WITH ASSOCIATION DISCREPANCY,
+accessed on October 15, 2025,
+https://ise.thss.tsinghua.edu.cn/~mlong/doc/anomaly-transformer-iclr22.pdf
+19. Multi-Dimensional Anomaly Detection and Fault Localization in Microservice
+Architectures: A Dual-Channel Deep Learning Approach with Causal Inference for
+Intelligent Sensing - MDPI, accessed on October 15, 2025,
+https://www.mdpi.com/1424-8220/25/11/3396
+20. Architecture of the proposed dual-channel framework for anomaly... | Download
+Scientific Diagram - ResearchGate, accessed on October 15, 2025,
+https://www.researchgate.net/figure/Architecture-of-the-proposed-dual-channel
+-framework-for-anomaly-detection-and-fault_fig1_392181356
+21. Fault diagnosis of the HVDC system based on the CatBoost algorithm using
+knowledge graphs - Frontiers, accessed on October 15, 2025,
+https://www.frontiersin.org/journals/energy-research/articles/10.3389/fenrg.2023.1
+144785/full
+22. Automated Time Series Feature Engineering with MLforecast - Nixtla, accessed
+on October 15, 2025,
+https://www.nixtla.io/blog/automated-time-series-feature-engineering-with-mlfo
+recast
+23. Machine Learning Approaches to Time Series Anomaly Detection - Anomalo,
+accessed on October 15, 2025,
+https://www.anomalo.com/blog/machine-learning-approaches-to-time-series-an
+omaly-detection/
+24. Advanced Feature Engineering for Time Series Data | by Rahul Holla - Medium,
+accessed on October 15, 2025,
+https://medium.com/@rahulholla1/advanced-feature-engineering-for-time-series
+-data-5f00e3a8ad29
+25. What is Overfitting? - Overfitting in Machine Learning Explained - AWS - Updated
+2025, accessed on October 15, 2025, https://aws.amazon.com/what-is/overfitting/
+20
+26. How do you deal with a high Feature/Sample ratio? - Cross Validated - Stats
+StackExchange, accessed on October 15, 2025,
+https://stats.stackexchange.com/questions/621386/how-do-you-deal-with-a-high
+-feature-sample-ratio
+27. Is Random Forest suitable for very small data sets? - Cross Validated, accessed
+on October 15, 2025,
+https://stats.stackexchange.com/questions/192310/is-random-forest-suitable-for
+-very-small-data-sets
+28. LO2: Microservice API Anomaly Dataset of Logs and Metrics - arXiv, accessed on
+October 15, 2025, https://arxiv.org/html/2504.12067v1
+29. Performance of the different faults types. | Download Scientific Diagram -
+ResearchGate, accessed on October 15, 2025,
+https://www.researchgate.net/figure/Performance-of-the-different-faults-types_
+fig4_367607144
+30. Deep Attentive Anomaly Detection for Microservice Systems with Multimodal
+Time-Series Data - Meng Yan's, accessed on October 15, 2025,
+https://yanmeng.github.io/papers/ICWS221.pdf
+21

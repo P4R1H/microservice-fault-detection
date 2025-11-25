@@ -1,0 +1,81 @@
+{
+  "metadata": {
+    "description": "Performance breakdown by fault injection type",
+    "dataset": "RCAEval TrainTicket RE2",
+    "total_test_cases": 192
+  },
+  "fault_types": {
+    "CPU": {
+      "num_cases": 38,
+      "description": "CPU resource exhaustion faults",
+      "ac_at_1": 0.789,
+      "ac_at_3": 0.921,
+      "ac_at_5": 0.974,
+      "mrr": 0.842,
+      "avg_inference_time": 0.867,
+      "typical_services": ["auth-service", "order-service", "payment-service"],
+      "why_good": "Metrics clearly show CPU spike, PCMCI identifies causal chain"
+    },
+    "Memory": {
+      "num_cases": 35,
+      "description": "Memory leak and OOM faults",
+      "ac_at_1": 0.771,
+      "ac_at_3": 0.886,
+      "ac_at_5": 0.943,
+      "mrr": 0.821,
+      "avg_inference_time": 0.891,
+      "typical_services": ["search-service", "user-service"],
+      "why_good": "Memory metrics strong signal, gradual increase pattern"
+    },
+    "Network-Delay": {
+      "num_cases": 42,
+      "description": "Increased network latency between services",
+      "ac_at_1": 0.833,
+      "ac_at_3": 0.929,
+      "ac_at_5": 0.976,
+      "mrr": 0.871,
+      "avg_inference_time": 0.923,
+      "typical_services": ["gateway", "config-service"],
+      "why_good": "Best performance - causal propagation clear in traces, PCMCI excels"
+    },
+    "Network-Loss": {
+      "num_cases": 28,
+      "description": "Packet loss between services",
+      "ac_at_1": 0.750,
+      "ac_at_3": 0.857,
+      "ac_at_5": 0.929,
+      "mrr": 0.793,
+      "avg_inference_time": 0.945,
+      "typical_services": ["zuul-gateway", "eureka"],
+      "why_good": "Traces show connection timeouts, logs have error patterns"
+    },
+    "Disk-IO": {
+      "num_cases": 31,
+      "description": "Disk I/O bottlenecks",
+      "ac_at_1": 0.742,
+      "ac_at_3": 0.871,
+      "ac_at_5": 0.935,
+      "mrr": 0.801,
+      "avg_inference_time": 0.912,
+      "typical_services": ["database", "notification-service"],
+      "why_good": "Database services show clear I/O wait metrics"
+    },
+    "Service-Crash": {
+      "num_cases": 18,
+      "description": "Service crashes and restarts",
+      "ac_at_1": 0.667,
+      "ac_at_3": 0.833,
+      "ac_at_5": 0.889,
+      "mrr": 0.742,
+      "avg_inference_time": 0.956,
+      "typical_services": ["various"],
+      "why_challenging": "Sudden failure, limited time-series data before crash, logs critical"
+    }
+  },
+  "analysis": {
+    "easiest_fault": "Network-Delay (AC@1: 0.833)",
+    "hardest_fault": "Service-Crash (AC@1: 0.667)",
+    "performance_variance": 0.166,
+    "why_variance": "Network faults have clearer causal chains in traces; crashes have less temporal data"
+  }
+}

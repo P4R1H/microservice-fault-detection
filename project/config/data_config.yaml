@@ -1,0 +1,98 @@
+# Data Configuration
+# Dataset paths, splits, and preprocessing settings
+
+data:
+  # Dataset location
+  dataset_name: "RCAEval"
+  dataset_path: "data/RCAEval"  # Local path
+
+  # Systems to use
+  systems:
+    - "TrainTicket"
+    - "SockShop"
+    - "OnlineBoutique"
+
+  # RE versions
+  re_versions:
+    - "RE2"  # Primary version
+
+  # Fault types
+  fault_types:
+    - "CPU"
+    - "MEM"
+    - "DISK"
+    - "DELAY"
+    - "LOSS"
+    - "SOCKET"
+
+splits:
+  # Train/val/test split
+  train_ratio: 0.6
+  val_ratio: 0.2
+  test_ratio: 0.2
+
+  # Splitting strategy
+  strategy: "scenario_based"  # Prevents data leakage
+  stratify_by: "fault_type"  # Balanced splits
+
+  # Expected sizes (270 total cases)
+  expected_train: 162
+  expected_val: 54
+  expected_test: 54
+
+preprocessing:
+  # Metrics preprocessing
+  metrics:
+    normalization: "zscore"  # Options: "zscore", "minmax", "none"
+    window_size: 12  # 1 hour at 5-min granularity
+    fill_method: "forward"  # For missing values
+    features:
+      - "cpu_usage_percent"
+      - "memory_usage_bytes"
+      - "network_bytes_sent"
+      - "network_bytes_recv"
+      - "disk_io_read"
+      - "disk_io_write"
+      - "response_time_ms"
+
+  # Logs preprocessing
+  logs:
+    window_size: "1min"  # Alignment with metrics
+    max_templates: 1000  # Drain3 vocabulary size
+    min_log_count: 5  # Ignore rare templates
+
+  # Traces preprocessing
+  traces:
+    aggregation_window: "5min"  # Match metrics granularity
+    node_features:
+      - "avg_latency"
+      - "p50_latency"
+      - "p90_latency"
+      - "p99_latency"
+      - "error_rate"
+      - "request_count"
+      - "dependency_count"
+    edge_features:
+      - "call_frequency"
+      - "avg_latency"
+      - "error_rate"
+
+data_loading:
+  # Lazy loading settings
+  lazy: true  # Don't load all CSVs at once
+  num_workers: 4  # Parallel data loading
+  pin_memory: true  # For GPU transfer
+  prefetch_factor: 2
+
+  # Caching
+  cache_processed: false  # Set true after first run
+  cache_dir: "outputs/cache"
+
+augmentation:
+  # Data augmentation (if enabled)
+  enabled: false
+  methods:
+    - "jitter"  # Add Gaussian noise
+    - "scaling"  # Magnitude scaling
+  jitter_std: 0.03  # 3% noise
+  scaling_range: [0.9, 1.1]  # ±10% scaling
