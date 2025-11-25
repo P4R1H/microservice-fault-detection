@@ -65,14 +65,14 @@ class LogsEncoder(nn.Module):
         embedding_dim: int = 256,
         embedding_method: str = 'tfidf',  # 'tfidf' or 'sentence-bert'
         drain_config: Optional[Dict] = None,
-        use_dummy: bool = True  # Use dummy encoder for now
+        use_fallback: bool = True  # Use fallback encoder for now
     ):
         super().__init__()
         self.embedding_dim = embedding_dim
         self.embedding_method = embedding_method
-        self.use_dummy = use_dummy
+        self.use_fallback = use_fallback
 
-        if use_dummy:
+        if use_fallback:
             # Use fallback encoder for testing
             self.fallback_encoder = FallbackLogsEncoder(embedding_dim)
         else:
@@ -87,14 +87,14 @@ class LogsEncoder(nn.Module):
 
     def parse_logs(self, log_file: str) -> List[str]:
         """Parse logs to extract template IDs."""
-        if self.use_dummy:
+        if self.use_fallback:
             return []
         # TODO: Implement Drain3 parsing
         raise NotImplementedError("Full logs encoder - Phase 5 implementation")
 
     def embed_templates(self, templates: List[str]) -> torch.Tensor:
         """Embed log templates."""
-        if self.use_dummy:
+        if self.use_fallback:
             return self.fallback_encoder()
         # TODO: Implement template embedding
         raise NotImplementedError("Full logs encoder - Phase 5 implementation")
@@ -104,12 +104,12 @@ class LogsEncoder(nn.Module):
         Encode log data.
 
         Args:
-            log_data: Dictionary with parsed log info (ignored if use_dummy=True)
+            log_data: Dictionary with parsed log info (ignored if use_fallback=True)
 
         Returns:
             (batch, embedding_dim) encoded representation
         """
-        if self.use_dummy:
+        if self.use_fallback:
             return self.fallback_encoder(log_data)
 
         # TODO: Implement full forward pass
@@ -119,7 +119,7 @@ class LogsEncoder(nn.Module):
 # Factory function
 def create_logs_encoder(
     embedding_dim: int = 256,
-    use_dummy: bool = True,
+    use_fallback: bool = True,
     **kwargs
 ) -> nn.Module:
     """
@@ -127,13 +127,13 @@ def create_logs_encoder(
 
     Args:
         embedding_dim: Output embedding dimension
-        use_dummy: Use dummy encoder (True) or full encoder (False)
+        use_fallback: Use fallback encoder (True) or full encoder (False)
         **kwargs: Additional arguments
 
     Returns:
         LogsEncoder instance
     """
-    return LogsEncoder(embedding_dim=embedding_dim, use_dummy=use_dummy, **kwargs)
+    return LogsEncoder(embedding_dim=embedding_dim, use_fallback=use_fallback, **kwargs)
 
 
 # TODO: Add error pattern extraction

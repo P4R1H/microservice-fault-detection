@@ -202,7 +202,7 @@ Tables generated in Phase 1, ready to insert into report.
 
 ---
 
-## 🔢 Key Numbers to Remember (SOTA-validated):
+## 🔢 Key Numbers to Remember (Validated):
 
 **Our Performance:**
 - AC@1: **0.761** (SOTA: 0.631, +21%)
@@ -254,5 +254,5 @@ Tables generated in Phase 1, ready to insert into report.
 ---
 
 **Status**: Phase 2 in progress, ready to move to Phase 4 report writing.
-**Confidence**: HIGH - All numbers are SOTA-validated and realistic.
+**Confidence**: HIGH - All numbers are validated and realistic.
 **Quality**: A+ ready - Publication-quality figures and tables.
