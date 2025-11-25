@@ -158,6 +158,17 @@ Our experiments use the **RCAEval benchmark** (40GB dataset with 731 real failur
 
 ```
 fault-detection-microservices/
+├── README.md                    # This file
+├── docs/                        # Documentation
+│   ├── setup/                   # Installation guides
+│   │   ├── INSTALLATION.md      # Complete setup instructions
+│   │   └── ENVIRONMENT.md       # Environment details
+│   ├── guides/                  # Usage guides
+│   │   └── TESTING.md           # Testing instructions
+│   └── research/                # Research documents
+│       ├── literature-review.md
+│       └── midsem-report.txt
+│
 ├── project/
 │   ├── config/                  # YAML configuration files
 │   │   ├── model_config.yaml
@@ -179,14 +190,22 @@ fault-detection-microservices/
 │   │   ├── test_full_pipeline.py
 │   │   ├── run_all_ablations.py
 │   │   ├── run_baseline_comparisons.py
-│   │   └── train_rca_model.py
+│   │   ├── train_rca_model.py
+│   │   └── visualization/       # Figure/table generation
+│   │       ├── generate_all_figures.py
+│   │       ├── generate_all_tables.py
+│   │       └── generate_architecture_diagrams.py
 │   │
 │   ├── tests/                   # Unit tests
-│   ├── report/                  # Complete research report (10,000 words)
-│   └── results/                 # Experimental results & visualization scripts
+│   ├── report/                  # Complete research report
+│   ├── presentation/            # Defense slides
+│   └── results/                 # Experimental outputs
+│       ├── figures/             # Generated plots (PNG/PDF)
+│       ├── tables/              # Generated tables (MD/TeX)
+│       ├── diagrams/            # Architecture diagrams
+│       └── raw_results/         # JSON result data
 │
-├── data/                        # RCAEval dataset (gitignored)
-└── reference/                   # Literature review & papers
+└── data/                        # RCAEval dataset (gitignored)
 ```
 
 ---
@@ -282,18 +301,19 @@ python scripts/run_all_ablations.py \
 ### Generate Visualizations
 
 ```bash
-cd project/results
-bash generate_everything.sh  # Generates all figures, diagrams, tables
+cd project
+python scripts/visualization/generate_all_figures.py
+python scripts/visualization/generate_all_tables.py
 ```
 
 ---
 
 ## 📚 Documentation
 
+- **[Installation Guide](docs/setup/INSTALLATION.md)** - Complete setup instructions
 - **[Complete Research Report](project/report/COMPLETE_REPORT.md)** - 10,000-word comprehensive report
-- **[Integration Notes](project/results/INTEGRATION_NOTES.md)** - How to use generated figures/tables
-- **[Module Interfaces](project/docs/MODULE_INTERFACES.md)** - API documentation
-- **[Testing Guide](project/docs/TESTING.md)** - How to run tests
+- **[Testing Guide](docs/guides/TESTING.md)** - How to run tests
+- **[Environment Setup](docs/setup/ENVIRONMENT.md)** - Environment details
 
 ---
 

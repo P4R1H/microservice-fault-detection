@@ -8,7 +8,8 @@ figures in the figures/ directory.
 When you have new experimental data, just replace the JSON files and re-run this script!
 
 Usage:
-    python generate_all_figures.py
+    cd project
+    python scripts/visualization/generate_all_figures.py
 
 Output:
     - All figures saved to results/figures/
@@ -35,10 +36,12 @@ plt.rcParams['xtick.labelsize'] = 9
 plt.rcParams['ytick.labelsize'] = 9
 plt.rcParams['legend.fontsize'] = 9
 
-# Directories
-RAW_RESULTS = Path("raw_results")
-FIGURES_DIR = Path("figures")
-FIGURES_DIR.mkdir(exist_ok=True)
+# Directories - relative to project root
+SCRIPT_DIR = Path(__file__).parent
+PROJECT_DIR = SCRIPT_DIR.parent.parent
+RAW_RESULTS = PROJECT_DIR / "results" / "raw_results"
+FIGURES_DIR = PROJECT_DIR / "results" / "figures"
+FIGURES_DIR.mkdir(exist_ok=True, parents=True)
 
 def load_json(filename):
     """Load JSON data file."""

@@ -10,6 +10,10 @@ Creates professional system architecture diagrams showing:
 5. Deployment architecture
 
 All diagrams are publication-quality (300 DPI).
+
+Usage:
+    cd project
+    python scripts/visualization/generate_architecture_diagrams.py
 """
 
 import matplotlib.pyplot as plt
@@ -24,8 +28,11 @@ plt.rcParams['savefig.dpi'] = 300
 plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.size'] = 10
 
-DIAGRAMS_DIR = Path("diagrams")
-DIAGRAMS_DIR.mkdir(exist_ok=True)
+# Directories - relative to project root
+SCRIPT_DIR = Path(__file__).parent
+PROJECT_DIR = SCRIPT_DIR.parent.parent
+DIAGRAMS_DIR = PROJECT_DIR / "results" / "diagrams"
+DIAGRAMS_DIR.mkdir(exist_ok=True, parents=True)
 
 def save_figure(fig, name):
     """Save figure in PNG and PDF formats."""
