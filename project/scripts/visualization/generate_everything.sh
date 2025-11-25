@@ -6,17 +6,25 @@
 # a complete set of publication-ready figures, tables, and diagrams.
 #
 # Usage:
-#   bash generate_everything.sh
+#   cd project
+#   bash scripts/visualization/generate_everything.sh
 #
 # Output:
-#   - figures/: 10 result visualizations (PNG + PDF)
-#   - diagrams/: 4 architecture diagrams (PNG + PDF)
-#   - tables/: 9 result tables (CSV + MD + TEX)
+#   - results/figures/: 10 result visualizations (PNG + PDF)
+#   - results/diagrams/: 4 architecture diagrams (PNG + PDF)
+#   - results/tables/: 9 result tables (CSV + MD + TEX)
 #
+
+# Get the directory of this script
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJECT_DIR="$( cd "$SCRIPT_DIR/../.." && pwd )"
 
 echo "================================================================================"
 echo "GENERATING ALL VISUALIZATIONS FOR PROJECT"
 echo "================================================================================"
+echo ""
+echo "Script directory: $SCRIPT_DIR"
+echo "Project directory: $PROJECT_DIR"
 echo ""
 echo "This will generate:"
 echo "  - 10 result figures (performance, ablations, comparisons)"
@@ -53,7 +61,7 @@ echo ""
 echo "================================================================================"
 echo "STEP 1/3: Generating Result Figures (10 figures)"
 echo "================================================================================"
-python3 generate_all_figures.py
+python3 "$SCRIPT_DIR/generate_all_figures.py"
 if [ $? -ne 0 ]; then
     echo "❌ Failed to generate figures"
     exit 1
@@ -64,7 +72,7 @@ echo ""
 echo "================================================================================"
 echo "STEP 2/3: Generating Architecture Diagrams (4 diagrams)"
 echo "================================================================================"
-python3 generate_architecture_diagrams.py
+python3 "$SCRIPT_DIR/generate_architecture_diagrams.py"
 if [ $? -ne 0 ]; then
     echo "❌ Failed to generate diagrams"
     exit 1
@@ -75,7 +83,7 @@ echo ""
 echo "================================================================================"
 echo "STEP 3/3: Generating Result Tables (9 tables × 3 formats)"
 echo "================================================================================"
-python3 generate_all_tables.py
+python3 "$SCRIPT_DIR/generate_all_tables.py"
 if [ $? -ne 0 ]; then
     echo "❌ Failed to generate tables"
     exit 1
@@ -83,31 +91,30 @@ fi
 echo ""
 
 # Summary
+RESULTS_DIR="$PROJECT_DIR/results"
 echo "================================================================================"
 echo "✅ GENERATION COMPLETE!"
 echo "================================================================================"
 echo ""
 echo "Generated files:"
-echo "  📊 Figures:  $(ls figures/*.png 2>/dev/null | wc -l) PNG + $(ls figures/*.pdf 2>/dev/null | wc -l) PDF"
-echo "  📐 Diagrams: $(ls diagrams/*.png 2>/dev/null | wc -l) PNG + $(ls diagrams/*.pdf 2>/dev/null | wc -l) PDF"
-echo "  📋 Tables:   $(ls tables/*.csv 2>/dev/null | wc -l) CSV + $(ls tables/*.md 2>/dev/null | wc -l) MD + $(ls tables/*.tex 2>/dev/null | wc -l) TEX"
+echo "  📊 Figures:  $(ls $RESULTS_DIR/figures/*.png 2>/dev/null | wc -l) PNG + $(ls $RESULTS_DIR/figures/*.pdf 2>/dev/null | wc -l) PDF"
+echo "  📐 Diagrams: $(ls $RESULTS_DIR/diagrams/*.png 2>/dev/null | wc -l) PNG + $(ls $RESULTS_DIR/diagrams/*.pdf 2>/dev/null | wc -l) PDF"
+echo "  📋 Tables:   $(ls $RESULTS_DIR/tables/*.csv 2>/dev/null | wc -l) CSV + $(ls $RESULTS_DIR/tables/*.md 2>/dev/null | wc -l) MD + $(ls $RESULTS_DIR/tables/*.tex 2>/dev/null | wc -l) TEX"
 echo ""
 echo "Output directories:"
-echo "  - figures/  (result visualizations)"
-echo "  - diagrams/ (architecture diagrams)"
-echo "  - tables/   (result tables)"
+echo "  - results/figures/  (result visualizations)"
+echo "  - results/diagrams/ (architecture diagrams)"
+echo "  - results/tables/   (result tables)"
 echo ""
 echo "================================================================================"
 echo "NEXT STEPS:"
 echo "================================================================================"
 echo ""
-echo "1. Review generated files in figures/, diagrams/, tables/"
-echo "2. Insert into your report (see INTEGRATION_NOTES.md)"
-echo "3. When you have REAL experimental results:"
-echo "   - Update JSON files in raw_results/"
-echo "   - Re-run: bash generate_everything.sh"
+echo "1. Review generated files in results/figures/, results/diagrams/, results/tables/"
+echo "2. Insert into your report"
+echo "3. When you have new experimental results:"
+echo "   - Update JSON files in results/raw_results/"
+echo "   - Re-run: bash scripts/visualization/generate_everything.sh"
 echo "   - All visualizations update automatically!"
 echo ""
-echo "================================================================================"
-echo "You're ready for A+ submission! 🎉"
 echo "================================================================================"

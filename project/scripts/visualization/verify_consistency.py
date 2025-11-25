@@ -11,7 +11,8 @@ This script verifies that all result values are consistent across:
 Run this before submission to catch any inconsistencies.
 
 Usage:
-    python verify_consistency.py
+    cd project
+    python scripts/visualization/verify_consistency.py
 """
 
 import json
@@ -19,8 +20,9 @@ import re
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-# Define project structure
-PROJECT_ROOT = Path(__file__).parent.parent
+# Define project structure - relative to script location
+SCRIPT_DIR = Path(__file__).parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent
 RESULTS_DIR = PROJECT_ROOT / "results" / "raw_results"
 REPORT_PATH = PROJECT_ROOT / "report" / "COMPLETE_REPORT.md"
 README_PATH = PROJECT_ROOT.parent / "README.md"

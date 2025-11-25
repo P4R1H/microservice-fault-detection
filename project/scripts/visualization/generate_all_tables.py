@@ -6,7 +6,8 @@ This script creates markdown tables, CSV files, and LaTeX tables
 from the experimental results in raw_results/*.json
 
 Usage:
-    python generate_all_tables.py
+    cd project
+    python scripts/visualization/generate_all_tables.py
 
 Output:
     - Markdown tables for report
@@ -18,10 +19,12 @@ import json
 import pandas as pd
 from pathlib import Path
 
-# Directories
-RAW_RESULTS = Path("raw_results")
-TABLES_DIR = Path("tables")
-TABLES_DIR.mkdir(exist_ok=True)
+# Directories - relative to project root
+SCRIPT_DIR = Path(__file__).parent
+PROJECT_DIR = SCRIPT_DIR.parent.parent
+RAW_RESULTS = PROJECT_DIR / "results" / "raw_results"
+TABLES_DIR = PROJECT_DIR / "results" / "tables"
+TABLES_DIR.mkdir(exist_ok=True, parents=True)
 
 def load_json(filename):
     """Load JSON data file."""
