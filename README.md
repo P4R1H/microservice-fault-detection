@@ -3,7 +3,6 @@
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0.1-EE4C2C.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Paper](https://img.shields.io/badge/Paper-arXiv-red.svg)](https://arxiv.org/)
 
 > **State-of-the-Art multimodal deep learning system for root cause analysis in microservice architectures, achieving 76.1% AC@1 accuracy (+21% vs SOTA) using foundation models and causal discovery.**
 
@@ -61,7 +60,7 @@ This project presents a novel **multimodal RCA system** that:
 
 ```bash
 # Clone repository
-git clone https://github.com/[your-username]/fault-detection-microservices.git
+git clone https://github.com/p4r1h/fault-detection-microservices.git
 cd fault-detection-microservices/project
 
 # Install dependencies
@@ -436,15 +435,15 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 **Supervisors**: Prof. Rajib Mall, Dr. Suchi Kumari
 
 **Department of Computer Science and Engineering**
-**[Your University]**
+**Shiv Nadar University**
 
 ---
 
 ## 📧 Contact
 
 For questions or collaboration:
-- Email: [your-email@university.edu]
-- GitHub Issues: [github.com/your-repo/issues](https://github.com/)
+- Email: pg972@snu.edu.in
+- GitHub Issues: [github.com/p4r1h/fault-detection-microservices/issues](https://github.com/p4r1h/fault-detection-microservices/issues)
 
 ---
 
