@@ -1,0 +1,106 @@
+# Experiment Configuration
+# Training, evaluation, and ablation settings
+
+experiment:
+  name: "multimodal_rca"
+  seed: 42
+  deterministic: true  # For reproducibility
+
+training:
+  # Batch size and epochs
+  batch_size: 16  # Adjust based on VRAM
+  num_epochs: 50
+  early_stopping_patience: 10
+
+  # Optimization
+  optimizer: "adamw"
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  scheduler: "cosine"  # Options: "cosine", "step", "none"
+  warmup_steps: 100
+
+  # Gradient clipping
+  max_grad_norm: 1.0
+
+  # Loss function
+  loss: "cross_entropy"  # For service classification
+  label_smoothing: 0.1
+
+evaluation:
+  # Metrics to compute
+  metrics:
+    - "AC@1"
+    - "AC@3"
+    - "AC@5"
+    - "Avg@5"
+    - "MRR"
+
+  # Statistical testing
+  n_seeds: 5  # For statistical robustness
+  significance_level: 0.05  # p-value threshold
+
+  # Per-category evaluation
+  evaluate_per_fault_type: true
+  evaluate_per_system: true
+
+ablation:
+  # Modality ablation
+  modalities:
+    - "metrics_only"
+    - "logs_only"
+    - "traces_only"
+    - "metrics_logs"
+    - "metrics_traces"
+    - "logs_traces"
+    - "all_modalities"
+
+  # Encoder ablation
+  encoders:
+    metrics: ["chronos", "tcn"]
+    traces: ["gcn", "gat"]
+
+  # Causal ablation
+  causal_methods:
+    - "none"
+    - "granger"
+    - "pcmci"
+
+  # Fusion ablation
+  fusion_strategies:
+    - "early"
+    - "late"
+    - "intermediate"
+
+baseline_comparison:
+  # Baselines to compare against
+  baselines:
+    - "3sigma"
+    - "arima"
+    - "granger_lasso"
+    - "random_walk"
+    # Add more as needed:
+    # - "microRCA"
+    # - "traceRCA"
+    # - "RUN"
+
+  # Statistical tests
+  run_significance_tests: true
+  compute_effect_size: true
+
+logging:
+  # Experiment tracking
+  use_tensorboard: true
+  use_wandb: false
+  log_interval: 10  # Log every N batches
+
+  # Checkpointing
+  save_checkpoints: true
+  checkpoint_interval: 5  # Save every N epochs
+  keep_best_only: true
+
+output:
+  # Where to save results
+  results_dir: "outputs/results"
+  models_dir: "outputs/models"
+  figures_dir: "outputs/figures"
+  logs_dir: "outputs/logs"

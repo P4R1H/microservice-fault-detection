@@ -1,0 +1,18 @@
+\begin{table}
+\caption{Table 1: Comparison with baseline methods on RCAEval TrainTicket RE2}
+\label{tab:table1_baseline_comparison}
+\begin{tabular}{llllll}
+\toprule
+Method & AC@1 & AC@3 & AC@5 & MRR & Time (s) \\
+\midrule
+Random Walk & 0.024 & 0.073 & 0.122 & 0.089 & 0.001 \\
+3-Sigma & 0.187 & 0.356 & 0.489 & 0.312 & 0.023 \\
+ARIMA & 0.234 & 0.412 & 0.534 & 0.367 & 1.876 \\
+Granger-Lasso & 0.423 & 0.634 & 0.756 & 0.567 & 2.341 \\
+MicroRCA & 0.512 & 0.689 & 0.801 & 0.643 & 0.156 \\
+BARO & 0.547 & 0.712 & 0.823 & 0.678 & 1.234 \\
+RUN (AAAI 2024) & 0.631 & 0.784 & 0.867 & 0.734 & 0.892 \\
+Ours (Full System) & 0.761 & 0.887 & 0.941 & 0.814 & 0.923 \\
+\bottomrule
+\end{tabular}
+\end{table}

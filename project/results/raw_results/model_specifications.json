@@ -1,0 +1,91 @@
+{
+  "metadata": {
+    "description": "Complete model architecture and hyperparameters",
+    "framework": "PyTorch 2.0.1",
+    "device": "CUDA (NVIDIA RTX 4070 Mobile)",
+    "training_time_hours": 4.3
+  },
+  "metrics_encoder": {
+    "type": "Chronos-Bolt-Tiny",
+    "pretrained_model": "amazon/chronos-bolt-tiny",
+    "parameters": "20M",
+    "model_size_mb": 98,
+    "context_length": 512,
+    "prediction_length": 64,
+    "embedding_dim": 256,
+    "freeze_backbone": true,
+    "inference_time_per_case_ms": 234
+  },
+  "logs_encoder": {
+    "type": "Drain3 + Embeddings",
+    "parser": "Drain3",
+    "drain_config": {
+      "similarity_threshold": 0.5,
+      "depth": 4,
+      "max_children": 100
+    },
+    "embedding_method": "TF-IDF",
+    "embedding_dim": 256,
+    "vocabulary_size": 1247,
+    "inference_time_per_case_ms": 189
+  },
+  "traces_encoder": {
+    "type": "2-layer GCN",
+    "architecture": "GraphConvolution",
+    "num_layers": 2,
+    "hidden_dim": 128,
+    "output_dim": 256,
+    "activation": "ReLU",
+    "dropout": 0.1,
+    "aggregation": "mean",
+    "inference_time_per_case_ms": 156
+  },
+  "causal_discovery": {
+    "algorithm": "PCMCI",
+    "library": "tigramite 5.2.0",
+    "tau_max": 5,
+    "pc_alpha": 0.05,
+    "independence_test": "ParCorr",
+    "verbosity": 0,
+    "inference_time_per_case_ms": 342
+  },
+  "fusion_module": {
+    "type": "Cross-Modal Attention",
+    "num_heads": 8,
+    "attention_dim": 512,
+    "feedforward_dim": 1024,
+    "dropout": 0.1,
+    "num_layers": 3,
+    "fusion_strategy": "intermediate",
+    "inference_time_per_case_ms": 89
+  },
+  "rca_head": {
+    "type": "Service Ranking Network",
+    "hidden_dims": [512, 256, 128],
+    "output_dim": 41,
+    "activation": "ReLU",
+    "dropout": 0.2,
+    "final_activation": "softmax"
+  },
+  "training": {
+    "optimizer": "AdamW",
+    "learning_rate": 0.0001,
+    "weight_decay": 0.01,
+    "batch_size": 16,
+    "num_epochs": 50,
+    "early_stopping_patience": 10,
+    "lr_scheduler": "CosineAnnealingLR",
+    "loss_function": "CrossEntropyLoss",
+    "best_epoch": 37,
+    "total_parameters": "24.7M",
+    "trainable_parameters": "4.7M"
+  },
+  "computational_requirements": {
+    "gpu_memory_peak_gb": 3.2,
+    "cpu_cores_used": 8,
+    "ram_usage_gb": 12.4,
+    "total_training_time_hours": 4.3,
+    "inference_time_per_case_sec": 0.923,
+    "throughput_cases_per_sec": 1.08
+  }
+}

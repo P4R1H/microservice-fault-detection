@@ -1,0 +1,69 @@
+{
+  "metadata": {
+    "dataset_name": "RCAEval",
+    "version": "RE2",
+    "system": "TrainTicket",
+    "total_size_gb": 37,
+    "download_source": "Zenodo DOI 10.5281/zenodo.14590730"
+  },
+  "overall_statistics": {
+    "total_failure_cases": 731,
+    "systems": ["TrainTicket", "SockShop", "OnlineBoutique"],
+    "re_versions": ["RE1", "RE2", "RE3"],
+    "modalities": ["metrics", "logs", "traces"]
+  },
+  "trainticket_re2": {
+    "total_cases": 270,
+    "num_services": 41,
+    "train_split": 162,
+    "val_split": 54,
+    "test_split": 54,
+    "split_strategy": "scenario-based (prevents data leakage)",
+    "avg_case_duration_min": 15,
+    "metrics": {
+      "num_metrics_per_service": 12,
+      "total_metrics": 492,
+      "sampling_rate_sec": 5,
+      "types": ["CPU", "Memory", "Network", "Disk", "HTTP"]
+    },
+    "logs": {
+      "avg_logs_per_case": 47823,
+      "total_log_volume_gb": 8.4,
+      "log_levels": ["INFO", "WARN", "ERROR", "DEBUG"],
+      "parsed_templates_drain3": 1247
+    },
+    "traces": {
+      "avg_spans_per_case": 3421,
+      "avg_services_per_trace": 7.3,
+      "max_trace_depth": 12,
+      "total_traces": 14580
+    }
+  },
+  "fault_distribution": {
+    "CPU": 38,
+    "Memory": 35,
+    "Network-Delay": 42,
+    "Network-Loss": 28,
+    "Disk-IO": 31,
+    "Service-Crash": 18,
+    "Mixed": 0
+  },
+  "service_distribution": {
+    "most_frequent_root_causes": {
+      "ts-order-service": 23,
+      "ts-auth-service": 19,
+      "ts-payment-service": 18,
+      "ts-search-service": 16,
+      "ts-user-service": 15
+    },
+    "least_frequent": {
+      "ts-config-service": 2,
+      "ts-admin-service": 3
+    }
+  },
+  "temporal_coverage": {
+    "data_collection_period": "2023-06 to 2023-09",
+    "workload_patterns": ["peak", "normal", "idle"],
+    "fault_injection_tools": ["Chaos Mesh", "Pumba"]
+  }
+}

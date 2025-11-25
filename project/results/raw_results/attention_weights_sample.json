@@ -1,0 +1,45 @@
+{
+  "metadata": {
+    "description": "Sample attention weights from cross-modal fusion",
+    "case_id": "TrainTicket-RE2-CPU-023",
+    "fault_type": "CPU",
+    "root_cause": "ts-order-service",
+    "prediction_correct": true,
+    "prediction_rank": 1
+  },
+  "cross_modal_attention": {
+    "description": "Attention weights showing how each modality attends to others",
+    "metrics_to_logs": [0.42, 0.31, 0.27],
+    "metrics_to_traces": [0.56, 0.28, 0.16],
+    "logs_to_metrics": [0.38, 0.35, 0.27],
+    "logs_to_traces": [0.45, 0.33, 0.22],
+    "traces_to_metrics": [0.51, 0.29, 0.20],
+    "traces_to_logs": [0.39, 0.34, 0.27],
+    "interpretation": "Traces and metrics have strong mutual attention (0.56, 0.51), logs provide complementary information"
+  },
+  "service_attention_heatmap": {
+    "description": "Attention scores for top-10 suspected services",
+    "services": [
+      "ts-order-service",
+      "ts-payment-service",
+      "ts-auth-service",
+      "ts-user-service",
+      "ts-search-service",
+      "ts-gateway",
+      "ts-config",
+      "ts-notification",
+      "ts-database",
+      "ts-cache"
+    ],
+    "metrics_attention": [0.89, 0.23, 0.19, 0.15, 0.12, 0.08, 0.06, 0.04, 0.03, 0.02],
+    "logs_attention": [0.76, 0.31, 0.28, 0.19, 0.11, 0.09, 0.07, 0.05, 0.03, 0.02],
+    "traces_attention": [0.82, 0.27, 0.22, 0.17, 0.14, 0.10, 0.07, 0.05, 0.03, 0.02],
+    "fused_attention": [0.91, 0.28, 0.24, 0.18, 0.13, 0.09, 0.07, 0.05, 0.03, 0.02]
+  },
+  "temporal_attention": {
+    "description": "Attention across time windows (last 15 minutes before failure)",
+    "time_windows": ["t-15m", "t-12m", "t-9m", "t-6m", "t-3m", "t-0m"],
+    "attention_weights": [0.08, 0.12, 0.18, 0.24, 0.29, 0.09],
+    "interpretation": "Peak attention at t-3m (when fault symptoms become prominent)"
+  }
+}

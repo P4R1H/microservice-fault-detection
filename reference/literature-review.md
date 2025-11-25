@@ -1,0 +1,142 @@
+# Comprehensive Literature Review: Fault Detection and Localization in Cloud Microservices (2020-2025)
+
+## Overview
+
+This review identifies **37 significant academic papers** published between 2020-2025, covering diverse methodologies including classical ML, deep learning, graph neural networks, trace analysis, multi-modal fusion, and causal inference approaches. The papers span top-tier venues (ICSE, FSE, ASE, KDD, WWW, OSDI, ASPLOS) and represent the full spectrum of fault detection and root cause analysis techniques for microservice architectures.
+
+## Complete Research Papers Table
+
+| **Title & Year** | **Key Methodology** | **Dataset Used** | **Pros for Undergrads** | **Cons for Undergrads** |
+|------------------|---------------------|------------------|------------------------|------------------------|
+| **TraceAnomaly (2020)** ISSRE | Deep Bayesian Networks with Posterior Flow using VAE; Service Trace Vector (STV) encoding paths and response times; KDE for threshold determination | WeBank production (proprietary, 61-344 services); Train-Ticket (public, 41 services); GitHub available | Open-source on GitHub (NetManAIOps); High performance (97% recall, 98% precision); Unsupervised learning; Public Train-Ticket dataset | Complex posterior flow (Glow's flow); Heavy GPU requirements (3x Tesla P40); Advanced Bayesian concepts (ELBO, KDE); Requires RPC tracing framework |
+| **MicroRCA (2020)** NOMS | Attributed graph-based anomaly propagation; Autoencoder for abnormal metrics; Random walk on graph for root cause ranking; No instrumentation required | Sock-Shop (public) on GKE Kubernetes; Prometheus metrics; Istio service mesh | Open-source code on GitHub (elastisys/MicroRCA); Standard autoencoder (simpler than RNNs); 89% precision, 97% MAP; Application-agnostic | Requires GKE/Kubernetes setup; Istio service mesh complexity; Need to implement personalized PageRank; Graph construction algorithms |
+| **GMTA (2020)** ESEC/FSE | Graph-based trace representation; Abstracts traces into paths/flows; Neo4j + ClickHouse hybrid storage; Architecture visualization and performance detection | eBay production traces (10.29B traces, proprietary) | Clear graph abstraction model; Multiple use cases; Standard graph databases (Neo4j) | **No public dataset** (eBay proprietary); Two database systems required; Over-engineered for small systems; Industrial scale complexity |
+| **Performance Diagnosis (2020)** ICSOC Workshop | Deep Learning with autoencoder; Combines service dependency graph with autoencoder; Fine-grained metric-level RCA | Sock-Shop (public); Prometheus metrics | Uses well-known benchmark; Autoencoder straightforward; 92% service precision, 85.5% metric precision; Two-stage approach clear | Requires cloud infrastructure; Service dependency graph construction; Integration of graph + autoencoder complex |
+| **Automated Analysis of Distributed Tracing (2021)** Journal of Grid Computing | Extracts metrics from OpenTracing standard; Builds dependency graphs and workflows; Statistical and morphological anomaly detection | Real data from major cloud provider (anonymized, proprietary); OpenTracing-compliant | Works with standard OpenTracing/OpenTelemetry; Compatible with Jaeger/Zipkin; No complex ML required | **No specific public dataset**; Need OpenTracing-instrumented apps; Custom tool development; Significant trace volume needed |
+| **TraceRCA (2021)** IWQoS | Unsupervised trace anomaly detection; Frequent pattern mining for suspicious microservices; Statistical ranking based on abnormal/normal trace ratios | Train-Ticket (public, 222 faults); Production bank system; GitHub implementation | Public Train-Ticket available; No ML training (statistical); Clear algorithmic steps; GitHub code available; Unsupervised (no labels) | Requires full microservice deployment (45 services); Kubernetes cluster needed; Frequent pattern mining computationally intensive; Fault injection tools required |
+| **DAM (2022)** ICWS | LSTM with Attention Mechanism; Three LSTM networks (load, traffic, logs); EVT-based dynamic threshold (POT); Multimodal fusion | Train-Ticket (public, 41 services, 79,318 samples); Prometheus, Logstash, ElasticSearch | Public Train-Ticket benchmark; Standard PyTorch libraries; Unsupervised approach; 80.46% F-measure; Open-source tools | Kubernetes cluster setup; Complex multimodal fusion; Attention mechanism from scratch; Log parsing with Drain; Fault injection tools needed |
+| **DeepTraLog (2022)** ICSE | Gated Graph Neural Networks (GGNNs) + Deep SVDD; Unified Trace Event Graph (TEG) combining traces and logs; Event embedding with GloVe + TF-IDF | Train-Ticket V0.2.0 (public, 132,485 traces, 7.7M logs); Apache SkyWalking; Replication package available | Public dataset with replication package; PyTorch Geometric 1.7.2; Well-documented; Unsupervised; 93% precision, 97% recall | GPU required (RTX 3090, 24GB); Complex GNN architecture; Kubernetes setup (8 VMs, 32GB each); 67-minute training; Graph construction complexity |
+| **NLP-based LSTM (2022)** Journal of Cloud Computing | LSTM-based NLP for trace sequences; LTTng (Linux Trace Toolkit) for events; Treats traces as natural language; Predicts next event and arguments | Custom microservice with LTTng traces (public tools, custom data) | Standard LSTM (similar to text prediction); LTTng open-source; NLP-style intuitive; Trace Compass visualization | Requires LTTng kernel-level tracing; Custom data extraction module; Handcrafted feature engineering; Trace Compass scripting complexity |
+| **Micro2vec (2022)** Journal of Network and Computer Applications | Numeric representation mining from logs; Format-agnostic approach; Unsupervised learning; Analyzes metrics relationships across logs | Microservice-related technologies (proprietary custom) | Format-agnostic (any log format); No application knowledge needed; Unsupervised; Works with readily available logs | **Limited public dataset availability**; Numeric representation methodology unclear; May need custom log infrastructure; No open-source code |
+| **CIRCA (2022)** KDD | Causal Bayesian Network (CBN) based on system architecture; Intervention recognition via probability distribution changes; Descendant adjustment for root cause inference | Real-world online service metrics (proprietary); System topology information | Clear causal inference framework; Well-defined mathematical formulation; Standard statistical tests; Interpretable results; Elegant approach | Requires solid causal inference theory; CBN construction needs domain knowledge; Statistical hypothesis testing complexity; Assumes architecture information available |
+| **RCD (2022)** NeurIPS | Hierarchical and localized causal discovery; Ψ-PC algorithm (modified Peter-Clark); Treats failure as intervention on root cause; Only learns relevant causal graph portion | Sock-shop (public); Real cloud service provider (proprietary); Synthetic datasets | Clear algorithmic approach; Avoids full graph learning (efficient); Public Sock-shop available; Open-source on GitHub; Soundness guarantees | Requires causal discovery theory understanding; PC algorithm advanced; Hierarchical strategy needs careful implementation; Assumes causal sufficiency |
+| **OmniAnomaly (2019, cited 2020-2022)** KDD | Stochastic RNN combining GRU + VAE; Planar Normalizing Flows; Reconstruction probability for anomaly scoring | NASA SMAP/MSL (public); SMD Server Machine Dataset (public); AIOps Challenge 2020 (public); GitHub available | **Multiple public datasets**; Open-source code on GitHub; GRU simpler than LSTM; Extensive public benchmarks; Standard libraries | Normalizing Flows mathematically complex; Requires variational inference understanding; Stochastic models harder to debug; Multiple loss components |
+| **Sleuth (2023)** ASPLOS | Graph Neural Network capturing causal impact of spans; Trace clustering using trace distance; Unsupervised graph learning; Transfer learning with few-shot fine-tuning | Sock-Shop, Online Boutique, Train-Ticket (all public); Synthetic large-scale microservices | Multiple public benchmarks; Unsupervised (no labels); Transfer learning adaptable; Top-tier venue (ASPLOS); GNN libraries available | Requires GNN understanding; Trace data processing complex; Large-scale computational resources; Transfer learning setup complexity |
+| **Eadro (2023)** ICSE | Graph Attention Networks (GAT) for service dependencies; Multi-task learning (detection + localization); Processes metrics, logs, and KPIs; BiLSTM for logs, CNN for KPIs | TrainTicket, Sock Shop (public); Multi-source data; Code on GitHub (BEbillionaireUSD/Eadro) | **Code available on GitHub**; Standard benchmarks public; Multi-task learning educational; Well-documented; PyTorch | Complex multi-modal preprocessing; Multiple architectures (BiLSTM, CNN, GAT); Need three data modalities; GAT attention complexity; Joint learning tuning |
+| **TraceDiag (2023)** FSE | Reinforcement learning for service dependency graph pruning; Adaptive interpretable pruning policy; Causal-based method after pruning; Designed for large-scale systems | Microsoft Exchange system (proprietary, production M365) | Novel RL approach; Interpretable results; Adaptive policy (no manual tuning); Top-tier venue (FSE); Clear problem formulation | **No public dataset** (Microsoft proprietary); Complex RL setup; Large-scale production traces required; Graph pruning RL sophisticated; **Major barrier: proprietary data** |
+| **DiagFusion (2023)** IEEE Trans. Services Computing | Unified event representation from metrics, traces, and logs; GNN for root cause instance and failure type; Event-based anomaly detection and template parsing; Data augmentation | GAIA dataset (proprietary); TrainTicket (public); Multi-modal | Event-based representation clear; Standard anomaly detection and log parsing; GNN well-documented; Modular pipeline; Public TrainTicket available | Three preprocessing pipelines required; GNN for heterogeneous graphs complex; Event extraction needs domain knowledge; Dependency graph construction non-trivial |
+| **AnoFusion (2023)** KDD | Graph Transformer Network (GTN) for heterogeneous multimodal correlation; GAT + GRU integration; Unsupervised instance failure detection; Dynamic multimodal data handling | Production microservices (proprietary); Metrics, logs, traces; F1-scores 0.857 and 0.922 | Uses established architectures (GAT, GRU) with libraries; Unsupervised learning; Clear graph-based representation; Modular spatial (GAT) + temporal (GRU) | Graph Transformer Networks advanced; Requires GNN and sequence model understanding; Complex GAT-GRU integration; Multimodal correlation sophisticated; **Proprietary datasets** |
+| **Nezha (2023)** ESEC/FSE | Transforms multi-modal data into homogeneous event representation; Mines event graphs for patterns; Compares fault-free vs. fault-suffering phases; Fine-grained code region and resource type localization | Online Boutique, Train Ticket (both public); OpenTelemetry traces; GitHub repository | Event-based representation intuitive; Interpretable pattern comparison; **Public datasets** with fault labels; Well-documented GitHub; 89.77% top-1 accuracy | Event graph mining computationally intensive; Multiple preprocessing pipelines; Fine-grained localization (code region) complex; Requires domain knowledge for events |
+| **CausalRCA (2023)** Journal of Systems and Software | Gradient-based causal structure learning; DAG-GNN with variational autoencoder; Fine-grained service AND metric localization; PageRank for root cause inference | Sock-shop, Train Ticket (both public); System and application metrics; Fault injection | Unsupervised (no labels); DAG ensures causal interpretability; Public benchmarks; PageRank well-understood; Fine-grained localization | DAG-GNN gradient-based causal discovery complex; Variational autoencoder adds complexity; Acyclicity constraints challenging; Computationally expensive; Doesn't scale well (\u003e200 metrics) |
+| **PERT-GNN (2023)** KDD | Graph Transformer for end-to-end latency prediction; PERT (Program Evaluation and Review Technique) Graphs from traces; Supervised graph regression; Captures temporal causality | Common microservice benchmarks; Alibaba production traces (large-scale); Synthetic and real-world | Well-defined latency prediction problem; Graph Transformer library support; PERT structured graph construction; \u003c12% MAPE; Real-world validation | Graph Transformer more complex than standard GNN; PERT critical path analysis understanding required; Extensive trace data for training; API-specific granularity complex; Large-scale traces hard to obtain |
+| **MLP for Microservices (2023)** Applied Sciences | Supervised Multi-Layer Perceptron (MLP); Service-level metrics (response times); Separate models for application and service anomalies; Standard feed-forward network | Sock-Shop (public); Custom fault injection dataset; Prometheus metrics; Grafana visualization | **Sock-Shop publicly available**; **MLP simplest neural architecture**; Standard sklearn/TensorFlow/PyTorch; Prometheus/Grafana widely documented; \u003e90% accuracy; Minimal complexity | Supervised learning requires labeled data (time-consuming); Need fault injection module; Limited to specific metrics; Doesn't capture temporal dependencies well; Dataset creation labor-intensive |
+| **RUN (2024)** AAAI | Neural Granger Causal Discovery with Contrastive Learning; Time series forecasting model; PageRank with personalization for top-k root causes | Synthetic datasets; Sock-Shop (public); Code on GitHub | **Public datasets** (Sock-Shop); **GitHub code available**; Clear problem formulation; Standard DL libraries; Well-documented (AAAI venue) | Requires Granger causality and causal inference understanding; Complex neural forecasting; PageRank integration adds complexity; Time series analysis expertise needed |
+| **MTG_CD (2024)** Journal of Cloud Computing | Multi-Scale Neural Transformation with residual networks and 1D convolutions; Graph Convolutional Network (GCN); Pearson correlation for adjacency matrix; PC Algorithm + PageRank | Sock-Shop (public, 13 services); Custom fault injection (CPU, memory, network); 5-second metrics | Well-known Sock-Shop; Clear step-by-step methodology; Standard GCN in PyTorch Geometric; 14.05% F1 improvement; Python 3.6, PyTorch 1.4.0 standard | Multi-scale transformation adds complexity; Requires GPU (NVIDIA 2080Ti); Graph construction and adjacency matrix learning challenging; 200 epochs training time |
+| **TCN-VAE (2024)** | Dual-Channel: Temporal Convolutional Networks (TCN) + Variational Autoencoders (VAE); Contrastive learning for unified representations; Causal inference for fault propagation; Semi-supervised learning | Custom real microservice environment (proprietary); Normal operational data + labeled anomalies | Semi-supervised reduces labeling; TCN simpler than transformers for time series; VAE well-documented; High performance (95.4% detection, 93.8% F1, 87.6% precision) | Dual-channel architecture complex; Causal inference module requires expertise; Contrastive learning challenging; **Custom dataset not public**; Requires understanding both temporal and probabilistic models |
+| **GAL-MAD (2024/2025)** arXiv | Graph Attention Network (GAT) for spatial dependencies; Bidirectional LSTM (Bi-LSTM) for temporal; Autoencoder architecture; Response time features with moving averages; cAdvisor metrics | Microservice applications with cAdvisor metrics (dataset not specified); Network anomalies | Unsupervised approach; Clear architecture (GAT + LSTM); Autoencoder well-understood; cAdvisor metrics standard and easy to collect; Good explainability | Requires implementing both GAT and LSTM; Graph construction from dependencies; Autoencoder threshold selection tricky; **Dataset not publicly specified** |
+| **MADMM (2024)** ICSE Companion | Multi-Modal Analysis of metrics and logs; GCN for spatial correlation in metrics; GAT for contextual relationships in log events; Contrastive Deep Clustering with dynamic weighting | Microservice systems with metrics and logs (dataset not clearly public) | Well-documented (ICSE venue); Multi-modal comprehensive; Uses standard GCN and GAT; Addresses real-world heterogeneity | Complex multi-modal fusion; Requires metrics AND log collection; Contrastive learning complexity; Dynamic weighting needs tuning; **Dataset not clearly specified as public** |
+| **Pre-trained KPI (2024)** KDD | Disentangled Transformer separating different KPI patterns; Pre-training for transfer to new microservices; Multi-head attention for metric correlation | KPI time-series data; Large-scale microservices; Microsoft production data (proprietary) | Pre-training paradigm modern and powerful; Transformer well-documented; Can leverage pre-trained models; Addresses practical transfer learning | Disentanglement mechanism complex; Pre-training requires large datasets; Transformer training computationally expensive; **Dataset likely proprietary** (Microsoft); Cutting-edge may lack mature implementations |
+| **BARO (2024)** FSE | Multivariate Bayesian online change point detection; Robust to inaccurate anomaly detection; Online learning approach | Real microservice applications (specifics not detailed) | Addresses detection inaccuracy problem; Online learning adaptable; Top-tier venue (FSE) | Requires statistical expertise; Bayesian methods complexity; Dataset not clearly specified |
+| **TraceWeaver (2024)** SIGCOMM | eBPF-based instrumentation-free tracing; Request trace reconstruction without code changes; Network-level observations; Eliminates tracing header propagation | Custom microservice deployments; Test environments with call graphs | Innovative eBPF (cutting-edge); No application modification; Can work with existing apps; Educational eBPF learning; Practical for real deployments | **eBPF steep learning curve**; Requires Linux kernel expertise; Complex network packet analysis; Needs privileged access; Platform-specific (Linux); Kernel-level debugging skills; Limited Windows support |
+| **SparseRCA (2024)** ISSRE | Unsupervised learning of span Exclusive Latency (ExL) distribution; Designed for sparse testing traces; Statistical modeling of latency patterns; No manual annotation | **Alibaba trace datasets** (2021, 2022, available on Harvard Dataverse); Production microservices | **Public datasets** (Harvard Dataverse); Addresses realistic testing scenario; Unsupervised (no labels); Real Alibaba production data; Statistical methods more accessible | Large-scale datasets (millions of traces); Sparse data harder to work with; Statistical modeling requires probability theory; Complex production data; Testing environment setup still required |
+| **LLMParser (2024)** ICSE | First comprehensive study of LLMs for log parsing; Few-shot learning with generative LLMs (Flan-T5, LLaMA-7B, ChatGLM-6B); In-context learning (ICL) prompting | **Loghub-2k benchmark** (16 systems, 2000 logs each, public from LogPai project); Manually labeled ground truth | **EXCELLENT for undergrads**: Uses existing LLM APIs; **Public benchmark** (Loghub-2k) readily available; No complex training from scratch; Pre-trained models via API/HuggingFace; 96% accuracy state-of-the-art; Educational prompt engineering | API costs for commercial LLMs; Open-source models need GPU for inference; Prompt engineering experimentation; Performance sensitive to demonstrations; Model hallucinations; Limited control over closed models |
+| **MULAN (2024)** WWW | Log-tailored language model for log representation; Contrastive learning (modality-invariant + modality-specific); KPI-aware attention mechanism; Random walk with restart for fault propagation | GAIA (proprietary), Online Boutique, Train Ticket (both public); Product Review Microservice on Hugging Face; LEMMA-RCA dataset (Hugging Face) | **Dataset on Hugging Face**; Modern contrastive learning; Multi-modal learning educational; Pre-processed data available; Active research area | Complex multi-modal architecture; Requires causal inference theory; Language model training resource-intensive; Contrastive learning implementation complex; Random walk graph theory knowledge |
+| **GAMMA (2024)** WWW | Graph Neural Network-based multi-bottleneck localization; Mixture of experts; Attention mechanisms for multiple simultaneous bottlenecks; Models microservice dependency graphs | Open-source benchmarking on Kubernetes; Practical bottleneck scenarios; Multiple fault injections | Practical Kubernetes deployment; 46% higher F1-score; Explainable (mixture of experts); Cloud-native focus | Mixture of experts architecture complex; Requires Kubernetes infrastructure; Multi-bottleneck modeling more complex; Paper full details may need access; Need GNN + Kubernetes expertise; Workload generation for testing |
+| **FAMOS (2025)** ICSE | Gaussian-attention mechanism for multi-modal correlation; Cross-attention for inter-modality relationships; Multi-modal Transformer fusing metrics, logs, traces | GAIA dataset (proprietary); Proprietary industrial dataset; Metrics, logs, traces with spans | Transformer-based with documented attention; Modular design (extraction + fusion); Standard Gaussian attention conceptually straightforward; Cross-attention design pattern clear | Requires multiple attention mechanisms (Gaussian + cross); Transformer for multi-modal data complex; Needs three data sources simultaneously; Feature extraction from heterogeneous data sophisticated; Advanced DL knowledge |
+| **HERO (2025/2026)** ICWE | Heterogeneous Graph Neural Network (HGNN); Unified framework for detection AND RCA; Novel explainability technique; Eliminates need for root cause labeled data; Unsupervised/self-supervised | Widely used MSA benchmark dataset (likely TrainTicket); No root cause labels required | **No labeled data requirement** (unsupervised); Unified framework (one model for both tasks); Heterogeneous graph naturally models microservices; Explainability built-in; Recent modern approach | Heterogeneous GNN more complex than homogeneous; Multiple node and edge types definition; Explainability details require understanding; Very recent (2025) - implementation may not be widely available; Heterogeneous graph construction careful design |
+| **Microscope (2018/cited 2020-2022)** ICSOC | Constructs service causal graph from system calls; Graph-based root cause via conditioned graph traversal; No source code instrumentation; Kalman filtering for anomaly detection; PageRank-like ranking | Sock Shop (public); Kubernetes deployment; Network-based system call capture | No code instrumentation (black-box); 88% precision, 80% recall; Clear causal graph construction; Sock Shop widely available; Graph traversal well-established; Real-time compatible | Not using modern GNN techniques (pre-DL); Requires system call capture infrastructure; Causal discovery needs statistical knowledge; Custom graph traversal implementation; Limited to performance issues (latency-focused) |
+
+## Key Insights and Recommendations
+
+### Distribution Analysis
+
+**By Time Period:**
+- **2020-2022**: 13 papers (35%) - Foundation period with autoencoders, LSTM, early GNN adoption
+- **2023-2025**: 24 papers (65%) - Advanced period with transformers, LLMs, heterogeneous GNNs, causal inference
+
+**By Methodology:**
+- **Classical ML/Simple DL**: 4 papers (MLP, Autoencoder-based, Statistical)
+- **LSTM/RNN-based**: 6 papers (DAM, TraceAnomaly, NLP-based, GAL-MAD, TCN-VAE, Eadro)
+- **Graph Neural Networks**: 12 papers (DeepTraLog, Sleuth, GAMMA, HERO, PERT-GNN, MTG_CD, CausalRCA, DiagFusion, AnoFusion, Eadro, MADMM, Nezha)
+- **Trace Analysis**: 9 papers (TraceRCA, DeepTraLog, GMTA, Sleuth, TraceDiag, TraceWeaver, SparseRCA, Eadro, PERT-GNN)
+- **Multi-modal Fusion**: 10 papers (DAM, MULAN, FAMOS, AnoFusion, DiagFusion, Nezha, Eadro, MADMM, TCN-VAE, GAMMA)
+- **Causal Inference**: 7 papers (CIRCA, RCD, CausalRCA, MULAN, TraceDiag, RUN, Microscope)
+- **LLM/Transformer-based**: 4 papers (LLMParser, Pre-trained KPI, FAMOS, PERT-GNN)
+
+### Top Recommendations for Undergraduate Implementation
+
+**Tier 1 - Highly Suitable (Public Data + Code + Reasonable Complexity):**
+
+1. **LLMParser (2024)** - API-based LLMs, public Loghub-2k dataset, minimal training, 96% accuracy
+2. **MicroRCA (2020)** - GitHub code, Sock-Shop, standard autoencoder, application-agnostic
+3. **OmniAnomaly (2019/2020-2022)** - Multiple public NASA datasets, GitHub code, well-documented GRU+VAE
+4. **TraceRCA (2021)** - GitHub code, Train-Ticket public, statistical approach (no complex ML)
+5. **MLP for Microservices (2023)** - Simplest neural architecture, Sock-Shop public, standard libraries
+
+**Tier 2 - Moderate Difficulty (Public Data but Higher Complexity):**
+
+6. **DeepTraLog (2022)** - Public Train-Ticket with replication package, GGNN educational, well-documented
+7. **Eadro (2023)** - GitHub code available, public benchmarks, multi-task learning valuable
+8. **Nezha (2023)** - GitHub repository, public datasets with fault labels, interpretable approach
+9. **Sleuth (2023)** - Multiple public benchmarks, unsupervised, transfer learning capability
+10. **SparseRCA (2024)** - Public Alibaba datasets on Harvard Dataverse, statistical methods accessible
+
+**Tier 3 - Challenging (Limited Public Data or High Complexity):**
+
+- Papers using proprietary datasets: TraceDiag (Microsoft), GMTA (eBay), FAMOS (GAIA), AnoFusion (production)
+- Advanced architectures: HERO (Heterogeneous GNN), TraceWeaver (eBPF), CausalRCA (DAG-GNN)
+- Multi-modal complexity: MULAN, MADMM, TCN-VAE
+
+### Public Dataset Availability Summary
+
+**Fully Public and Accessible:**
+- **Train-Ticket** (41-64 services) - Most popular, used in 10+ papers
+- **Sock-Shop** (13-15 services) - Simpler, used in 8+ papers
+- **Online Boutique** (12 services, Google) - Used in 4+ papers
+- **NASA SMAP/MSL** - For time-series anomaly detection
+- **Loghub-2k** (16 systems) - For log parsing
+- **Alibaba traces** (Harvard Dataverse) - Production-scale traces
+- **Hugging Face datasets** - LEMMA-RCA, Product Review Microservice
+
+**Proprietary/Limited Access:**
+- eBay production (GMTA)
+- Microsoft Exchange (TraceDiag)
+- WeBank (TraceAnomaly)
+- GAIA dataset (multiple papers, proprietary)
+
+### Emerging Trends (2023-2025)
+
+1. **Multi-modal Integration** - Combining metrics, logs, and traces is now standard practice
+2. **Graph Neural Networks** - Dominant architecture for capturing service dependencies
+3. **Causal Inference** - Moving from correlation to causation for explainability
+4. **LLM Integration** - Using pre-trained language models for log parsing and analysis
+5. **Transfer Learning** - Pre-training models that adapt to new microservice environments
+6. **Unsupervised/Self-Supervised** - Reducing dependency on labeled failure data
+7. **Fine-grained Localization** - From service-level to metric/code-region level RCA
+
+### Implementation Recommendations for Undergraduate Projects
+
+**Starting Point Strategy:**
+1. Begin with **single-modal approaches** (metrics OR logs, not both)
+2. Use **well-documented public benchmarks** (Train-Ticket or Sock-Shop)
+3. Leverage **existing implementations** (GitHub repositories when available)
+4. Start with **supervised learning** (clearer objectives than unsupervised)
+5. Progress to **graph-based methods** once comfortable with basics
+
+**Technology Stack:**
+- **Deep Learning**: PyTorch (most papers), TensorFlow (some)
+- **Graph Neural Networks**: PyTorch Geometric, DGL
+- **Monitoring**: Prometheus, Grafana, cAdvisor
+- **Tracing**: Jaeger, Zipkin, Apache SkyWalking, OpenTelemetry
+- **Deployment**: Kubernetes, Docker
+- **LLMs**: HuggingFace Transformers, OpenAI API
+
+**Complexity Factors to Consider:**
+- Multi-modal fusion \u003e Single modality
+- Causal discovery \u003e Correlation-based methods
+- Unsupervised learning \u003e Supervised learning
+- Heterogeneous GNN \u003e Standard GNN
+- Transformers \u003e LSTM/GRU \u003e Feed-forward networks
+- Production-scale \u003e Benchmark-scale
+
+This comprehensive review provides a complete landscape of fault detection and localization research in cloud microservices, with clear guidance for undergraduate implementation based on dataset availability, code accessibility, and methodological complexity.
