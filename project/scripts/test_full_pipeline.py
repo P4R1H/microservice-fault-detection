@@ -33,7 +33,7 @@ try:
     print("\n1. Creating encoders...")
     metrics_encoder = TCNEncoder(in_channels=7, embedding_dim=256)
     traces_encoder = GCNEncoder(in_channels=8, embedding_dim=128)
-    logs_encoder = create_logs_encoder(embedding_dim=256, use_dummy=True)
+    logs_encoder = create_logs_encoder(embedding_dim=256, use_fallback=True)
     print("✓ Encoders created successfully")
 
     # 2. Create fusion
@@ -69,11 +69,11 @@ try:
     n_params = sum(p.numel() for p in rca_model.parameters())
     print(f"  - Total parameters: {n_params:,} (~{n_params/1e6:.1f}M)")
 
-    # 4. Test forward pass with dummy data
+    # 4. Test forward pass with test data
     print("\n4. Testing forward pass...")
     batch_size = 2
     metrics = torch.randn(batch_size, 12, 7)  # (batch, seq_len, features)
-    logs = None  # Skip logs for now (will use dummy encoder)
+    logs = None  # Skip logs for now (will use fallback encoder)
     traces = (
         torch.randn(10, 8),  # node features: (num_nodes, node_dim)
         torch.randint(0, 10, (2, 20))  # edge index: (2, num_edges)
@@ -124,7 +124,7 @@ try:
     print("\n7. Testing evaluation metrics...")
     from src.models import compute_accuracy_at_k, compute_mrr
 
-    # Create dummy predictions
+    # Create test predictions
     predictions = output['ranking']  # (batch, num_services)
     targets = target_services
 
@@ -157,7 +157,7 @@ try:
     print("✅ ALL TESTS PASSED!")
     print("=" * 70)
     print("\nFull pipeline is working correctly:")
-    print("  ✓ Encoders (TCN, GCN, Dummy Logs)")
+    print("  ✓ Encoders (TCN, GCN, Fallback Logs)")
     print("  ✓ Multimodal fusion with cross-attention")
     print("  ✓ RCA model with service ranking")
     print("  ✓ Service embeddings (with/without)")

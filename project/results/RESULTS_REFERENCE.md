@@ -532,5 +532,5 @@ TrainTicket (41 services):    0.92s
 ---
 
 **Last Updated**: 2025-01-14
-**Status**: All numbers SOTA-validated and internally consistent
+**Status**: All numbers validated and internally consistent
 **Quality**: Publication-grade, ready for submission
