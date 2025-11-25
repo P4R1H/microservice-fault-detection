@@ -8,6 +8,24 @@ Implements:
 - Statistical significance testing
 """
 
-from .metrics import compute_ac_at_k, compute_avg_at_k, compute_mrr
+from .metrics import (
+    compute_ac_at_k,
+    compute_avg_at_k,
+    compute_mrr,
+    compute_all_metrics,
+    RCAEvaluator,
+    evaluate_predictions,
+    paired_ttest,
+    compute_cohens_d
+)
 
-__all__ = ['compute_ac_at_k', 'compute_avg_at_k', 'compute_mrr']
+__all__ = [
+    'compute_ac_at_k',
+    'compute_avg_at_k',
+    'compute_mrr',
+    'compute_all_metrics',
+    'RCAEvaluator',
+    'evaluate_predictions',
+    'paired_ttest',
+    'compute_cohens_d'
+]

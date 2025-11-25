@@ -7,9 +7,9 @@ This module provides encoders for each modality:
 - Traces: GCN/GAT on service dependency graphs
 """
 
-# Will be populated in Phase 3-6
-# from .metrics_encoder import ChronosEncoder, TCNEncoder
-# from .logs_encoder import LogsEncoder
-# from .traces_encoder import GCNEncoder, GATEncoder
+from .tcn import TCNEncoder, TemporalBlock
 
-__all__ = []
+__all__ = [
+    'TCNEncoder',
+    'TemporalBlock'
+]

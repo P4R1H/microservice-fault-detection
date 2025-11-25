@@ -16,7 +16,7 @@ import pandas as pd
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.utils.data_loader import RCAEvalDataLoader
+from src.data.loader import RCAEvalDataLoader
 from src.baselines import (
     ThreeSigmaDetector,
     ARIMAForecaster,
