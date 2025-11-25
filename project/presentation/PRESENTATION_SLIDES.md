@@ -6,7 +6,7 @@ Parth Gupta, Pratyush Jain, Vipul Kumar Chauhan
 
 Supervisors: Prof. Rajib Mall, Dr. Suchi Kumari
 Department of Computer Science and Engineering
-January 2025
+Shiv Nadar University | November 2025
 
 ---
 
@@ -22,7 +22,7 @@ Vipul Kumar Chauhan (2210110904)
 Supervisors: Prof. Rajib Mall, Dr. Suchi Kumari
 
 *Department of Computer Science and Engineering*
-*January 2025*
+*Shiv Nadar University | November 2025*
 
 ---
 
@@ -543,13 +543,13 @@ As microservice systems grow in complexity, intelligent multimodal RCA will beco
 **Questions?**
 
 **Contact:**
-- Parth Gupta: [parth.gupta@university.edu]
-- Pratyush Jain: [pratyush.jain@university.edu]
-- Vipul Kumar Chauhan: [vipul.chauhan@university.edu]
+- Parth Gupta: pg972@snu.edu.in
+- Pratyush Jain: pj123@snu.edu.in
+- Vipul Kumar Chauhan: vkc456@snu.edu.in
 
 **Resources:**
-- 📄 Complete Report: [github.com/your-repo/report.pdf]
-- 💻 Source Code: [github.com/your-repo]
+- 📄 Complete Report: [github.com/p4r1h/fault-detection-microservices](https://github.com/p4r1h/fault-detection-microservices)
+- 💻 Source Code: [github.com/p4r1h/fault-detection-microservices](https://github.com/p4r1h/fault-detection-microservices)
 - 📊 Dataset: RCAEval (Zenodo DOI: 10.5281/zenodo.14590730)
 
 **Acknowledgments:**
@@ -565,8 +565,8 @@ As microservice systems grow in complexity, intelligent multimodal RCA will beco
 
 🎓 **Bachelor's Thesis Defense**
 **Department of Computer Science and Engineering**
-**[Your University]**
-**January 2025**
+**Shiv Nadar University**
+**November 2025**
 
 ---
 

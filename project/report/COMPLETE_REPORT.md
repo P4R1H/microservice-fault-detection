@@ -14,8 +14,8 @@ Prof. Rajib Mall
 Dr. Suchi Kumari
 
 **Department of Computer Science and Engineering**
-**Institution:** [Your University]
-**Date:** January 2025
+**Shiv Nadar University**
+**Date:** November 2025
 
 ---
 
@@ -962,7 +962,11 @@ As microservice systems grow in complexity, intelligent multimodal RCA will beco
 
 [19] Wang, P., et al. (2024). "RCAEval: A Benchmark for Root Cause Analysis of Microservice Systems." WWW.
 
-[20] [Additional 10+ references from literature review to be added]
+[20] Kipf, T. N., & Welling, M. (2017). "Semi-Supervised Classification with Graph Convolutional Networks." ICLR.
+
+[21] Vaswani, A., et al. (2017). "Attention Is All You Need." NeurIPS.
+
+[22] Brown, T., et al. (2020). "Language Models are Few-Shot Learners." NeurIPS.
 
 ---
 
@@ -1004,7 +1008,7 @@ As microservice systems grow in complexity, intelligent multimodal RCA will beco
 
 ### Appendix D: Reproducibility Checklist
 
-- [x] Code publicly available: github.com/[your-repo]
+- [x] Code publicly available: github.com/p4r1h/fault-detection-microservices
 - [x] Dataset publicly available: RCAEval (Zenodo)
 - [x] Hyperparameters documented: Section 4.4
 - [x] Random seeds reported: 42, 123, 456
