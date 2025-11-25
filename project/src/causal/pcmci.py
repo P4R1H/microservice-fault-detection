@@ -147,3 +147,76 @@ def precompute_causal_weights(
     print(f"Saved causal cache to {cache_path}")
     
     return causal_cache
+
+
+class CausalWeightComputer:
+    """
+    Wrapper class for computing and caching causal weights.
+    
+    Used during training to get causal weights for each batch.
+    """
+    
+    def __init__(self, 
+                 cache_path: str = 'outputs/causal_cache.pkl',
+                 services: Optional[List[str]] = None,
+                 max_lag: int = 5):
+        self.cache_path = cache_path
+        self.services = services
+        self.max_lag = max_lag
+        self.cache: Dict[str, np.ndarray] = {}
+        
+        # Load existing cache
+        if os.path.exists(cache_path):
+            with open(cache_path, 'rb') as f:
+                self.cache = pickle.load(f)
+            print(f"Loaded {len(self.cache)} cached causal weights")
+    
+    def get_weights(self, case_id: str, n_services: int) -> np.ndarray:
+        """Get causal weights for a single case."""
+        if case_id in self.cache:
+            weights = self.cache[case_id]
+            # Resize if needed
+            if weights.shape[0] != n_services:
+                new_weights = np.eye(n_services, dtype=np.float32)
+                min_n = min(weights.shape[0], n_services)
+                new_weights[:min_n, :min_n] = weights[:min_n, :min_n]
+                return new_weights
+            return weights
+        
+        # Return identity if not cached
+        return np.eye(n_services, dtype=np.float32)
+    
+    def get_batch_weights(self, case_ids: List[str], n_services: int, 
+                          device: str = 'cpu'):
+        """Get causal weights for a batch of cases. Returns torch.Tensor."""
+        import torch
+        weights = np.stack([
+            self.get_weights(cid, n_services) for cid in case_ids
+        ])
+        return torch.from_numpy(weights).float().to(device)
+    
+    def precompute(self, cases, services: List[str]):
+        """Precompute causal weights for a list of cases."""
+        n_services = len(services)
+        new_count = 0
+        
+        for case in tqdm(cases, desc="Computing PCMCI"):
+            if case.case_id not in self.cache:
+                service_data = case.get_service_metrics(services)
+                weights = compute_pcmci_weights(service_data, services, self.max_lag)
+                self.cache[case.case_id] = weights
+                new_count += 1
+                
+                # Save periodically
+                if new_count % 20 == 0:
+                    self._save_cache()
+        
+        if new_count > 0:
+            self._save_cache()
+            print(f"Computed {new_count} new causal weight matrices")
+    
+    def _save_cache(self):
+        """Save cache to disk."""
+        os.makedirs(os.path.dirname(self.cache_path), exist_ok=True)
+        with open(self.cache_path, 'wb') as f:
+            pickle.dump(self.cache, f)

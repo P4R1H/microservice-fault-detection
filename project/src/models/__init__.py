@@ -9,7 +9,20 @@ from .rca import (
     CrossModalAttention
 )
 
+from .rca_v2 import (
+    RCAModelV2,
+    RankingLoss,
+    MultiScaleTCN,
+    CausalGraphAttention,
+    FocalLoss
+)
+
 __all__ = [
     'RCAModel',
-    'CrossModalAttention'
+    'CrossModalAttention',
+    'RCAModelV2',
+    'RankingLoss',
+    'MultiScaleTCN',
+    'CausalGraphAttention',
+    'FocalLoss'
 ]
