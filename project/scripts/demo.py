@@ -39,10 +39,10 @@ sys.path.insert(0, str(PROJECT_ROOT))
 # Configuration
 # ============================================================================
 
-# Best model checkpoint (V4.1 TF-IDF, seed 123 = 85.2% AC@1)
-BEST_MODEL_PATH = "outputs/models/multimodal_v41_tfidf_s123.pt"
-# Alternative: V4.0 seed 123 (81.5% AC@1)
-ALT_MODEL_PATH = "outputs/models/multimodal_v4_seed123.pt"
+# Best model checkpoint (seed 456 = 92.6% AC@1)
+BEST_MODEL_PATH = "outputs/models/v4_s456.pt"
+# Alternative: seed 123 (77.8% AC@1)
+ALT_MODEL_PATH = "outputs/models/v4_s123.pt"
 
 DATA_ROOT = "data/RCAEval"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
@@ -84,7 +84,7 @@ def get_model_path() -> str:
     else:
         # Find any v4 model
         models_dir = PROJECT_ROOT / "outputs" / "models"
-        for f in models_dir.glob("multimodal_v4*.pt"):
+        for f in models_dir.glob("v4_s*.pt"):
             return str(f)
     
     raise FileNotFoundError("No trained model found! Please train a model first.")
