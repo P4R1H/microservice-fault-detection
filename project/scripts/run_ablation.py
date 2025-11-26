@@ -158,6 +158,7 @@ def train_ablation_variant(
     best_val_ac1 = 0
     best_epoch = 0
     patience_counter = 0
+    best_state = model.state_dict().copy()  # Initialize with initial state
     
     history = {'train': [], 'val': []}
     
@@ -367,7 +368,7 @@ def main():
         seed=args.seed
     )
     
-    print(f"Train: {len(train_loader.dataset)}, Val: {len(val_loader.dataset)}, Test: {len(test_loader.dataset)}")
+    print(f"Train: {len(train_loader.dataset)}, Val: {len(val_loader.dataset)}, Test: {len(test_loader.dataset)}")  # type: ignore
     
     # Initialize causal computer
     causal_computer = CausalWeightComputer(cache_path='outputs/causal_cache_multimodal.pkl')
@@ -407,9 +408,9 @@ def main():
             'seed': args.seed,
             'embed_dim': args.embed_dim,
             'hidden_dim': args.hidden_dim,
-            'n_train': len(train_loader.dataset),
-            'n_val': len(val_loader.dataset),
-            'n_test': len(test_loader.dataset),
+            'n_train': len(train_loader.dataset),  # type: ignore
+            'n_val': len(val_loader.dataset),  # type: ignore
+            'n_test': len(test_loader.dataset),  # type: ignore
             'date': datetime.now().isoformat()
         },
         'variants': []
