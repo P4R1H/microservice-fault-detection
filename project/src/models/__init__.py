@@ -1,28 +1,17 @@
 """
 RCA models module.
 
-End-to-end models for root cause analysis.
+Current model: MultimodalRCAModel V4 with configurable encoders.
 """
 
-from .rca import (
-    RCAModel,
-    CrossModalAttention
-)
-
-from .rca_v2 import (
-    RCAModelV2,
-    RankingLoss,
-    MultiScaleTCN,
-    CausalGraphAttention,
-    FocalLoss
+from .rca_v4_multimodal import (
+    MultimodalRCAModel,
+    MultimodalLoss,
+    create_multimodal_model
 )
 
 __all__ = [
-    'RCAModel',
-    'CrossModalAttention',
-    'RCAModelV2',
-    'RankingLoss',
-    'MultiScaleTCN',
-    'CausalGraphAttention',
-    'FocalLoss'
+    'MultimodalRCAModel',
+    'MultimodalLoss',
+    'create_multimodal_model'
 ]
