@@ -1,78 +1,136 @@
-# Model Configuration
-# All hyperparameters for encoders, fusion, and RCA model
+# V4 Multimodal RCA Model Configuration
+# Architecture: Depthwise Separable TCN + Gated Fusion + Cross-Service Attention + PCMCI
+# This is the actual configuration used in production
 
 model:
-  # Metrics Encoder Configuration
+  name: "MultimodalRCAModel_V4"
+  description: "Lightweight multimodal RCA with TCN encoders and causal attention"
+  
+  # Model size configurations
+  configs:
+    small:
+      embed_dim: 128
+      hidden_dim: 32
+      parameters: "~324K"
+    large:
+      embed_dim: 192
+      hidden_dim: 48
+      parameters: "~722K"
+  
+  # Modality Encoders (all use Depthwise Separable TCN)
   metrics_encoder:
-    type: "chronos"  # Options: "chronos", "tcn"
-
-    # Chronos-Bolt-Tiny settings
-    chronos:
-      model_name: "amazon/chronos-bolt-tiny"
-      embedding_dim: 256
-      freeze_backbone: true
-      context_length: 512
-      prediction_length: 64
-
-    # TCN settings (for ablation)
-    tcn:
-      in_channels: 7  # Number of raw metrics
-      hidden_channels: 64
-      embedding_dim: 256
-      num_layers: 7
-      kernel_size: 3
-      dilation: [1, 2, 4, 8, 16, 32, 64]  # Exponential dilation
-      dropout: 0.3
-
-  # Logs Encoder Configuration
-  logs_encoder:
-    embedding_dim: 256
-    embedding_method: "tfidf"  # Options: "tfidf", "sentence-bert"
-
-    # Drain3 configuration
-    drain:
-      similarity_threshold: 0.5  # 0.4-0.7 range
-      depth: 4
-      max_children: 100
-
-    # Sentence-BERT settings (if used)
-    sentence_bert:
-      model_name: "all-MiniLM-L6-v2"
-
-  # Traces Encoder Configuration
-  traces_encoder:
-    type: "gcn"  # Options: "gcn", "gat"
-    in_channels: 8  # Node features (latency, error rate, etc.)
-    hidden_channels: 64
-    embedding_dim: 128
+    type: "depthwise_separable_tcn"
+    n_features: 64
+    hidden_dim: "${model.configs.large.hidden_dim}"  # 48
+    embed_dim: "${model.configs.large.embed_dim}"    # 192
     num_layers: 2
-    dropout: 0.3
-
-    # GAT specific (if type="gat")
-    gat:
-      num_heads: 4
-      attention_dropout: 0.4
-
-  # Causal Discovery Configuration
-  causal:
-    method: "pcmci"  # Options: "pcmci", "granger", "none"
-    tau_max: 5  # Maximum time lag (5-minute intervals)
-    pc_alpha: 0.15  # Liberal parent discovery
-    alpha_level: 0.05  # Conservative edge selection
-    independence_test: "parcorr"  # Options: "parcorr", "gpdc"
-
-  # Multimodal Fusion Configuration
+    kernel_size: 3
+    dilation: [1, 2]  # Exponential dilation
+    dropout: 0.35
+  
+  logs_encoder:
+    type: "depthwise_separable_tcn"
+    n_features: 32  # Log template counts
+    hidden_dim: "${model.configs.large.hidden_dim}"
+    embed_dim: "${model.configs.large.embed_dim}"
+    num_layers: 2
+    kernel_size: 3
+    dilation: [1, 2]
+    dropout: 0.35
+  
+  traces_encoder:
+    type: "depthwise_separable_tcn"
+    n_features: 32  # Latency + error features
+    hidden_dim: "${model.configs.large.hidden_dim}"
+    embed_dim: "${model.configs.large.embed_dim}"
+    num_layers: 2
+    kernel_size: 3
+    dilation: [1, 2]
+    dropout: 0.35
+  
+  # Gated Fusion
   fusion:
-    strategy: "intermediate"  # Options: "early", "late", "intermediate"
-    fusion_dim: 512
-    num_heads: 8
-    dropout: 0.1
+    strategy: "gated"
+    description: "Learned gates dynamically weight modality contributions"
+    # g = sigmoid(W_g [e_m; e_l; e_t] + b_g)
+    # e_fused = g_m * e_m + g_l * e_l + g_t * e_t
+  
+  # Cross-Service Attention
+  attention:
+    num_layers: 2
+    num_heads: 4
+    dropout: 0.35
+    causal_injection: true
+    causal_weight: 0.3  # λ for PCMCI attention bias
+  
+  # Causal Discovery
+  causal:
+    method: "pcmci"
+    tau_max: 3  # Maximum time lag (45 seconds at 15s sampling)
+    alpha_level: 0.05
+    independence_test: "parcorr"
+    cache_enabled: true
+    cache_path: "outputs/causal_cache_multimodal.pkl"
 
-  # RCA Model Configuration
-  rca:
-    hidden_dim: 256
-    dropout: 0.1
+# Training Configuration
+training:
+  optimizer: "adamw"
+  learning_rate: 0.001
+  weight_decay: 0.01
+  batch_size: 8
+  epochs: 100
+  early_stopping_patience: 20
+  
+  # Gradient
+  clip_grad: 1.0
+  
+  # Scheduler
+  scheduler: "cosine_annealing_warm_restarts"
+  t0: 10
+  t_mult: 2
+  
+  # Loss
+  loss:
+    type: "cross_entropy_with_ranking"
+    label_smoothing: 0.1
+    rank_weight: 0.3
+    margin: 0.5
+  
+  # Regularization
+  dropout: 0.35
 
-# Device configuration
-device: "cuda"  # Options: "cuda", "cpu"
-mixed_precision: true  # Use FP16 for memory efficiency
+# Data Configuration
+data:
+  dataset: "RCAEval RE2"
+  systems:
+    - name: "OnlineBoutique"
+      cases: 47
+    - name: "SockShop"
+      cases: 53
+    - name: "TrainTicket"
+      cases: 81
+  total_cases: 181
+  
+  split:
+    train: 0.70  # 127 cases
+    val: 0.15    # 27 cases
+    test: 0.15   # 27 cases
+  
+  features:
+    metrics:
+      timesteps: 60
+      features_per_service: 64
+    logs:
+      timesteps: 60
+      features_per_service: 32  # Log template counts
+    traces:
+      timesteps: 60
+      features_per_service: 32  # 16 latency + 16 error features
+  
+  n_services: 10
+
+# Device
+device: "cuda"  # or "cpu"
+
+# Random seeds used in evaluation
+seeds: [42, 123, 456, 789, 2024]

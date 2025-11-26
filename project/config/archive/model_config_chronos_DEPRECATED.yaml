@@ -1,0 +1,78 @@
+# Model Configuration
+# All hyperparameters for encoders, fusion, and RCA model
+
+model:
+  # Metrics Encoder Configuration
+  metrics_encoder:
+    type: "chronos"  # Options: "chronos", "tcn"
+
+    # Chronos-Bolt-Tiny settings
+    chronos:
+      model_name: "amazon/chronos-bolt-tiny"
+      embedding_dim: 256
+      freeze_backbone: true
+      context_length: 512
+      prediction_length: 64
+
+    # TCN settings (for ablation)
+    tcn:
+      in_channels: 7  # Number of raw metrics
+      hidden_channels: 64
+      embedding_dim: 256
+      num_layers: 7
+      kernel_size: 3
+      dilation: [1, 2, 4, 8, 16, 32, 64]  # Exponential dilation
+      dropout: 0.3
+
+  # Logs Encoder Configuration
+  logs_encoder:
+    embedding_dim: 256
+    embedding_method: "tfidf"  # Options: "tfidf", "sentence-bert"
+
+    # Drain3 configuration
+    drain:
+      similarity_threshold: 0.5  # 0.4-0.7 range
+      depth: 4
+      max_children: 100
+
+    # Sentence-BERT settings (if used)
+    sentence_bert:
+      model_name: "all-MiniLM-L6-v2"
+
+  # Traces Encoder Configuration
+  traces_encoder:
+    type: "gcn"  # Options: "gcn", "gat"
+    in_channels: 8  # Node features (latency, error rate, etc.)
+    hidden_channels: 64
+    embedding_dim: 128
+    num_layers: 2
+    dropout: 0.3
+
+    # GAT specific (if type="gat")
+    gat:
+      num_heads: 4
+      attention_dropout: 0.4
+
+  # Causal Discovery Configuration
+  causal:
+    method: "pcmci"  # Options: "pcmci", "granger", "none"
+    tau_max: 5  # Maximum time lag (5-minute intervals)
+    pc_alpha: 0.15  # Liberal parent discovery
+    alpha_level: 0.05  # Conservative edge selection
+    independence_test: "parcorr"  # Options: "parcorr", "gpdc"
+
+  # Multimodal Fusion Configuration
+  fusion:
+    strategy: "intermediate"  # Options: "early", "late", "intermediate"
+    fusion_dim: 512
+    num_heads: 8
+    dropout: 0.1
+
+  # RCA Model Configuration
+  rca:
+    hidden_dim: 256
+    dropout: 0.1
+
+# Device configuration
+device: "cuda"  # Options: "cuda", "cpu"
+mixed_precision: true  # Use FP16 for memory efficiency

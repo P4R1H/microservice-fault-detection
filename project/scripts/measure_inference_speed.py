@@ -1,9 +1,14 @@
 """
 Measure inference speed of our multimodal V4 model vs SOTA baselines.
+
+Outputs results to outputs/inference_speed.json
 """
 
 import sys
 import os
+import json
+from datetime import datetime
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import torch
@@ -11,6 +16,7 @@ import time
 import numpy as np
 from src.models.rca_v4_multimodal import MultimodalRCAModel
 from src.data.multimodal_data import create_multimodal_loaders
+
 
 def measure_inference_time(model, dataloader, device, num_warmup=5, num_runs=100):
     """Measure average inference time per sample."""
@@ -206,6 +212,66 @@ def main():
     print(f"Per-sample (amortized): {per_sample*1000:.3f} ms ({per_sample:.6f} sec)")
     print(f"Throughput: {16/batch_time:.1f} samples/sec")
     
+    # Prepare results for JSON output
+    results = {
+        'metadata': {
+            'description': 'Inference speed benchmark for Multimodal V4 RCA Model',
+            'device': str(device),
+            'gpu_name': torch.cuda.get_device_name(0) if device.type == 'cuda' else 'N/A',
+            'num_warmup': 5,
+            'num_runs': 100,
+            'date': datetime.now().isoformat()
+        },
+        'our_models': {},
+        'baselines': {},
+        'batch_inference': {},
+        'summary': {}
+    }
+    
+    # Store our model times
+    for name, timing in our_times.items():
+        results['our_models'][name] = {
+            'mean_ms': timing['mean_ms'],
+            'std_ms': timing['std_ms'],
+            'min_ms': timing['min_ms'],
+            'max_ms': timing['max_ms'],
+            'mean_sec': timing['mean_sec'],
+            'speedup_vs_sota': sota_time / timing['mean_sec']
+        }
+    
+    # Store baseline times (from literature)
+    results['baselines'] = {
+        name: {
+            'time_sec': t,
+            'source': 'literature/RCAEval paper'
+        } for name, t in baselines.items()
+    }
+    
+    # Store batch inference results
+    results['batch_inference'] = {
+        'batch_size': 16,
+        'total_batch_time_ms': batch_time * 1000,
+        'per_sample_amortized_ms': per_sample * 1000,
+        'throughput_samples_per_sec': 16 / batch_time
+    }
+    
+    # Summary
+    results['summary'] = {
+        'sota_method': 'RUN (AAAI 2024)',
+        'sota_time_sec': sota_time,
+        'our_best_time_sec': best_our_time,
+        'speedup_factor': sota_time / best_our_time,
+        'batch_throughput': 16 / batch_time
+    }
+    
+    # Save to JSON
+    output_path = 'outputs/inference_speed.json'
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, 'w') as f:
+        json.dump(results, f, indent=2)
+    
+    print(f"\nResults saved to: {output_path}")
+    
     # Final verdict
     print("\n" + "=" * 70)
     print("FINAL VERDICT: SPEED COMPARISON")
@@ -224,6 +290,9 @@ def main():
     │  ✓ BEATS SOTA IN BOTH ACCURACY AND SPEED!                      │
     └─────────────────────────────────────────────────────────────────┘
     """)
+    
+    return results
+
 
 if __name__ == "__main__":
     main()

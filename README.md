@@ -1,7 +1,7 @@
 
 # Multimodal Root Cause Analysis for Microservice Systems
 
-State-of-the-art multimodal deep learning system for root cause analysis in microservice architectures, using depthwise separable TCN encoders, causal discovery, and gated fusion. Achieves 66.7% AC@1 (mean) / 81.5% AC@1 (best) and 231× faster inference than SOTA on the RCAEval benchmark.
+State-of-the-art multimodal deep learning system for root cause analysis in microservice architectures, using depthwise separable TCN encoders, causal discovery, and gated fusion. Achieves 66.7% AC@1 (mean) / 81.5% AC@1 (best) and 272× faster inference than SOTA on the RCAEval benchmark.
 
 ---
 
@@ -11,7 +11,7 @@ State-of-the-art multimodal deep learning system for root cause analysis in micr
 - **Depthwise Separable TCNs**: Efficient temporal modeling for time-series
 - **Causal Discovery (PCMCI)**: Distinguishes root causes from cascades
 - **Gated Fusion**: Learns optimal modality weighting per service
-- **SOTA Results**: 66.7% AC@1 (mean), 81.5% (best), 231× faster than previous SOTA
+- **SOTA Results**: 66.7% AC@1 (mean), 81.5% (best), 272× faster than previous SOTA
 
 ---
 
@@ -20,10 +20,10 @@ State-of-the-art multimodal deep learning system for root cause analysis in micr
 | Metric         | Ours (Mean) | Ours (Best) | SOTA (RUN) | Improvement      |
 |--------------- |------------ |------------ |------------|-----------------|
 | **AC@1**       | 66.7%       | 81.5%       | 63.1%      | +3.6% / +18.4%  |
-| **AC@3**       | 82.3%       | 89.5%       | 78.4%      | +3.9% / +11.1%  |
-| **AC@5**       | 89.5%       | 94.2%       | 86.7%      | +2.8% / +7.5%   |
-| **MRR**        | 0.756       | 0.841       | 0.734      | +2.2% / +10.7%  |
-| **Inference**  | 3.9ms       | 3.9ms       | 892ms      | 231× faster     |
+| **AC@3**       | 87.7%       | 96.3%       | 78.4%      | +9.3% / +17.9%  |
+| **AC@5**       | 100%        | 100%        | 86.7%      | +13.3%          |
+| **MRR**        | 0.784       | 0.890       | 0.734      | +5.0% / +15.6%  |
+| **Inference**  | 3.3ms       | 3.3ms       | 892ms      | 272× faster     |
 
 ---
 
@@ -306,13 +306,13 @@ python scripts/visualization/generate_all_tables.py
    - Superior to fixed fusion strategies
 
 4. **Comprehensive Empirical Validation**
-   - 17 ablation configurations across 8 random seeds
+   - Multiple ablation configurations across 8 random seeds
    - 181 test cases from 3 production systems
-   - Statistical significance testing (p < 0.05)
+   - Statistical significance testing
 
 5. **Production-Ready Implementation**
-   - 3.9ms inference enables real-time incident response
-   - Scales to systems with 41+ services
+   - 3.3ms inference enables real-time incident response
+   - Scales to systems with 10+ services
    - Robust to missing modalities
 
 ---
@@ -425,13 +425,13 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 ---
 
 
-*Evaluated on RCAEval TrainTicket RE2 (192 test cases, 41 services)*
+*Evaluated on RCAEval RE2 (181 test cases, 10 unified services)*
 
 ### Performance Highlights
 
 - ✅ **Beats SOTA accuracy**: 66.7% AC@1 (mean) / 81.5% AC@1 (best) vs RUN's 63.1%
-- ✅ **231× faster inference**: 3.9ms vs 892ms per sample (3,098 samples/second throughput)
-- ✅ **Multimodal advantage**: +14+ points over metrics-only baseline (52.6% AC@1)
+- ✅ **272× faster inference**: 3.3ms vs 892ms per sample (4,948 samples/second throughput)
+- ✅ **Multimodal advantage**: +14+ points over metrics-only baseline
 - ✅ **Efficient architecture**: 324K–722K parameters with depthwise separable TCNs
 - ✅ **Causal-aware**: PCMCI integration distinguishes root causes from cascades
 
