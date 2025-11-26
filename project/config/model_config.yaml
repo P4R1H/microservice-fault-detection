@@ -1,10 +1,12 @@
-# V4 Multimodal RCA Model Configuration
+# V4/V4.1/V5 Multimodal RCA Model Configuration
 # Architecture: Depthwise Separable TCN + Gated Fusion + Cross-Service Attention + PCMCI
-# This is the actual configuration used in production
+# V4.1: Added TF-IDF logs encoder option
+# V5.0: Added Gemini LLM embeddings for logs (requires API key)
 
 model:
   name: "MultimodalRCAModel_V4"
-  description: "Lightweight multimodal RCA with TCN encoders and causal attention"
+  description: "Lightweight multimodal RCA with configurable encoders and causal attention"
+  version: "4.1"  # V4.1 = TF-IDF logs, V4.2 = GCN traces, V5.0 = Gemini embeddings
   
   # Model size configurations
   configs:
@@ -17,7 +19,13 @@ model:
       hidden_dim: 48
       parameters: "~722K"
   
-  # Modality Encoders (all use Depthwise Separable TCN)
+  # Encoder type selection (V4.1+)
+  encoder_types:
+    logs: "tfidf"      # Options: tcn (V4), tfidf (V4.1), gemini (V5.0)
+    traces: "tcn"      # Options: tcn (V4), gcn (V4.2), gat
+    metrics: "tcn"     # Options: tcn (default), chronos (experimental)
+  
+  # Modality Encoders
   metrics_encoder:
     type: "depthwise_separable_tcn"
     n_features: 64
@@ -29,7 +37,7 @@ model:
     dropout: 0.35
   
   logs_encoder:
-    type: "depthwise_separable_tcn"
+    type: "${model.encoder_types.logs}"  # Configurable
     n_features: 32  # Log template counts
     hidden_dim: "${model.configs.large.hidden_dim}"
     embed_dim: "${model.configs.large.embed_dim}"
@@ -39,7 +47,7 @@ model:
     dropout: 0.35
   
   traces_encoder:
-    type: "depthwise_separable_tcn"
+    type: "${model.encoder_types.traces}"  # Configurable
     n_features: 32  # Latency + error features
     hidden_dim: "${model.configs.large.hidden_dim}"
     embed_dim: "${model.configs.large.embed_dim}"

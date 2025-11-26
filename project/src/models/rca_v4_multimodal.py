@@ -42,8 +42,11 @@ Architecture Overview:
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, Literal
 import math
+
+# Import logs encoder options
+from ..encoders.logs_encoder import TFIDFLogsEncoder, LogsEncoder
 
 
 class ModalityEncoder(nn.Module):
@@ -228,10 +231,12 @@ class CrossServiceAttention(nn.Module):
 
 class MultimodalRCAModel(nn.Module):
     """
-    Multimodal Root Cause Analysis Model (V4).
+    Multimodal Root Cause Analysis Model (V4/V4.1).
     
     Combines metrics, logs, and traces with gated fusion
     and causal-guided attention for root cause identification.
+    
+    V4.1 Update: Support for TF-IDF logs encoder (vs TCN)
     """
     
     def __init__(self,
@@ -244,12 +249,16 @@ class MultimodalRCAModel(nn.Module):
                  num_heads: int = 4,
                  num_attn_layers: int = 2,
                  dropout: float = 0.35,
-                 causal_weight: float = 0.3):
+                 causal_weight: float = 0.3,
+                 logs_encoder_type: Literal['tcn', 'tfidf', 'gemini'] = 'tfidf',
+                 traces_encoder_type: Literal['tcn', 'gcn', 'gat'] = 'tcn'):
         super().__init__()
         
         self.n_services = n_services
         self.embed_dim = embed_dim
         self.causal_weight = causal_weight
+        self.logs_encoder_type = logs_encoder_type
+        self.traces_encoder_type = traces_encoder_type
         
         # === Modality-Specific Encoders ===
         encoder_out_dim = embed_dim // 2  # 64 each, fuse to 128
@@ -262,14 +271,32 @@ class MultimodalRCAModel(nn.Module):
             dropout=dropout
         )
         
-        self.logs_encoder = ModalityEncoder(
-            in_features=n_log_features,
-            hidden_dim=hidden_dim // 2,  # Smaller for logs
-            out_dim=encoder_out_dim,
-            num_layers=2,
-            dropout=dropout
-        )
+        # === Logs Encoder (configurable) ===
+        if logs_encoder_type == 'tfidf':
+            # V4.1: TF-IDF weighted encoder with temporal features
+            self.logs_encoder = TFIDFLogsEncoder(
+                n_log_features=n_log_features,
+                hidden_dim=hidden_dim,
+                embed_dim=encoder_out_dim,
+                num_layers=2,
+                dropout=dropout
+            )
+        elif logs_encoder_type == 'tcn':
+            # Original V4: TCN encoder (treats logs as time series)
+            self.logs_encoder = ModalityEncoder(
+                in_features=n_log_features,
+                hidden_dim=hidden_dim // 2,
+                out_dim=encoder_out_dim,
+                num_layers=2,
+                dropout=dropout
+            )
+        elif logs_encoder_type == 'gemini':
+            # V5.0: Gemini LLM embeddings (to be implemented in Stage 3)
+            raise NotImplementedError("Gemini logs encoder - implement in Stage 3")
+        else:
+            raise ValueError(f"Unknown logs_encoder_type: {logs_encoder_type}")
         
+        # === Traces Encoder (configurable for Stage 2) ===
         self.traces_encoder = ModalityEncoder(
             in_features=n_trace_features,
             hidden_dim=hidden_dim // 2,  # Smaller for traces
@@ -487,9 +514,24 @@ def create_multimodal_model(
     n_trace_features: int = 32,
     hidden_dim: int = 32,
     embed_dim: int = 128,
-    dropout: float = 0.35
+    dropout: float = 0.35,
+    logs_encoder_type: str = 'tfidf',
+    traces_encoder_type: str = 'tcn'
 ) -> MultimodalRCAModel:
-    """Factory function to create multimodal RCA model."""
+    """
+    Factory function to create multimodal RCA model.
+    
+    Args:
+        n_services: Number of services in the system
+        n_metric_features: Number of metric features per service
+        n_log_features: Number of log template features per service
+        n_trace_features: Number of trace features per service
+        hidden_dim: Hidden dimension for encoders
+        embed_dim: Service embedding dimension
+        dropout: Dropout rate
+        logs_encoder_type: 'tcn' (V4), 'tfidf' (V4.1), or 'gemini' (V5)
+        traces_encoder_type: 'tcn' (V4), 'gcn' (V4.2), or 'gat'
+    """
     return MultimodalRCAModel(
         n_services=n_services,
         n_metric_features=n_metric_features,
@@ -497,7 +539,9 @@ def create_multimodal_model(
         n_trace_features=n_trace_features,
         hidden_dim=hidden_dim,
         embed_dim=embed_dim,
-        dropout=dropout
+        dropout=dropout,
+        logs_encoder_type=logs_encoder_type,
+        traces_encoder_type=traces_encoder_type
     )
 
 
