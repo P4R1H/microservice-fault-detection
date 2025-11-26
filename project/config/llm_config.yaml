@@ -1,0 +1,79 @@
+# LLM Configuration for V5 Multimodal RCA
+# Uses Google Gemini API (free tier)
+
+# =============================================================================
+# GEMINI API SETTINGS
+# =============================================================================
+gemini:
+  # API key loaded from environment variable
+  api_key_env: "GEMINI_API_KEY"
+  
+  # Embedding model for log semantic embeddings
+  embedding:
+    model: "text-embedding-004"
+    # Output dimension: 768 (will be projected to 64)
+    output_dim: 768
+    # Rate limits: 100 RPM, 30K TPM, 1000 RPD
+    batch_size: 50  # Process 50 templates at a time
+    retry_delay: 2.0  # Seconds between retries on rate limit
+    max_retries: 3
+  
+  # Chat model for explanations
+  chat:
+    model: "gemini-2.0-flash"
+    # Rate limits: 15 RPM, 1M TPM, 200 RPD
+    temperature: 0.3
+    max_output_tokens: 500
+    retry_delay: 5.0
+    max_retries: 3
+
+# =============================================================================
+# CACHING SETTINGS
+# =============================================================================
+cache:
+  enabled: true
+  # Cache directory (relative to project root)
+  dir: "outputs/llm_cache"
+  # Embedding cache file
+  embedding_cache: "embedding_cache.pkl"
+  # Explanation cache file  
+  explanation_cache: "explanation_cache.pkl"
+
+# =============================================================================
+# LOG ENCODER SETTINGS
+# =============================================================================
+logs_encoder:
+  # Type: "gemini", "tfidf", or "fallback"
+  type: "gemini"
+  
+  # Drain3 log parsing settings
+  drain3:
+    similarity_threshold: 0.5
+    depth: 4
+    max_children: 100
+  
+  # TF-IDF fallback settings (when Gemini unavailable)
+  tfidf:
+    max_features: 1000
+    ngram_range: [1, 2]
+  
+  # Projection settings (768 -> 64)
+  projection:
+    input_dim: 768  # Gemini embedding dim
+    hidden_dim: 256
+    output_dim: 64
+    dropout: 0.3
+
+# =============================================================================
+# EXPLAINER SETTINGS
+# =============================================================================
+explainer:
+  enabled: true
+  # Only generate explanations for top prediction
+  top_k_explain: 1
+  # Include evidence in explanation
+  include_metrics: true
+  include_logs: true
+  include_traces: true
+  # Max log lines to include in context
+  max_log_lines: 10

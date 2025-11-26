@@ -1,9 +1,15 @@
 """
-Training script for Multimodal RCA Model (V4).
+Training script for Multimodal RCA Model (V4/V4.1/V4.2).
+
+Versions:
+- V4: Original TCN encoders for all modalities
+- V4.1: TF-IDF logs encoder (fixes placeholder)
+- V4.2: GCN traces encoder (coming soon)
 
 Features:
 - Multimodal data loading (metrics + logs + traces)
 - PCMCI causal weight computation
+- Configurable encoder types
 - Cosine annealing with warm restarts
 - Gradient clipping
 - Early stopping
@@ -34,7 +40,7 @@ from src.data.multimodal_data import (
     discover_multimodal_cases,
     get_all_services_multimodal
 )
-from src.models.rca_v4_multimodal import MultimodalRCAModel, MultimodalLoss
+from src.models.rca_v4_multimodal import MultimodalRCAModel, MultimodalLoss, create_multimodal_model
 from src.causal.pcmci import CausalWeightComputer
 
 
@@ -198,18 +204,23 @@ def train(args):
     
     # Create model
     print("\nCreating model...")
-    model = MultimodalRCAModel(
+    print(f"  Logs encoder: {args.logs_encoder}")
+    print(f"  Traces encoder: {args.traces_encoder}")
+    
+    model = create_multimodal_model(
         n_services=n_services,
         n_metric_features=args.n_metric_features,
         n_log_features=args.n_log_features,
         n_trace_features=args.n_trace_features,
         hidden_dim=args.hidden_dim,
         embed_dim=args.embed_dim,
-        num_heads=args.num_heads,
-        num_attn_layers=args.num_attn_layers,
         dropout=args.dropout,
-        causal_weight=args.causal_weight
+        logs_encoder_type=args.logs_encoder,
+        traces_encoder_type=args.traces_encoder
     ).to(device)
+    
+    # Set causal weight manually (not in factory)
+    model.causal_weight = args.causal_weight
     
     params = model.count_parameters()
     print(f"Model parameters: {params['total']:,} ({params['trainable']:,} trainable)")
@@ -358,6 +369,12 @@ def main():
     parser.add_argument('--num-attn-layers', type=int, default=2)
     parser.add_argument('--dropout', type=float, default=0.35)
     parser.add_argument('--causal-weight', type=float, default=0.3)
+    parser.add_argument('--logs-encoder', type=str, default='tfidf',
+                        choices=['tcn', 'tfidf', 'gemini'],
+                        help='Logs encoder type: tcn (V4), tfidf (V4.1), gemini (V5)')
+    parser.add_argument('--traces-encoder', type=str, default='tcn',
+                        choices=['tcn', 'gcn', 'gat'],
+                        help='Traces encoder type: tcn (V4), gcn (V4.2), gat')
     
     # Training
     parser.add_argument('--epochs', type=int, default=100)

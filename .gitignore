@@ -95,5 +95,18 @@ project/wandb/
 project/config/*_override.yaml
 project/config/local_*.yaml
 
+# Environment files with secrets
+.env
+*.env
+project/.env
+
+# Gemini API key files
+gemini-key.txt
+*-key.txt
+*_key.txt
+
+# LLM cache files
+project/outputs/llm_cache/
+
 # Archived files
 .archive/
