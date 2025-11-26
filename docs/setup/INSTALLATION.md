@@ -51,9 +51,6 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 # Install PyTorch Geometric
 pip install torch-geometric
 
-# Install Chronos foundation model
-pip install chronos-forecasting
-
 # Install Tigramite for PCMCI
 pip install tigramite
 
@@ -112,22 +109,22 @@ When tests pass, you'll see:
 ==================================================
 TEST: Data Loading
 ==================================================
-✅ Loaded 270 cases total
-✅ Train: 162, Val: 54, Test: 54
+✅ Loaded 181 cases total (RCAEval RE2)
+✅ Train: 127, Val: 27, Test: 27
 
 ==================================================
-TEST: Metrics Encoder - Chronos-Bolt-Tiny
+TEST: Metrics Encoder - TCN
 ==================================================
-✅ Chronos encoder initialized
+✅ TCN encoder initialized
 ✅ Encoded 3 cases successfully
 ✅ Output shape: torch.Size([3, 60, 64])
 
 ==================================================
-TEST: Traces Encoder - GCN
+TEST: Multimodal Model
 ==================================================
-✅ Service graphs built: 3 cases
-✅ GCN encoder initialized
-✅ Output shape: torch.Size([3, num_services, 64])
+✅ Model initialized (722K params)
+✅ Forward pass successful
+✅ Output shape: torch.Size([3, 10])
 
 ==================================================
 ✅ ALL TESTS PASSED!
@@ -140,11 +137,9 @@ TEST: Traces Encoder - GCN
 
 | Script | Purpose | Runtime |
 |--------|---------|---------|
-| `test_encoders.py` | Test all encoders (Chronos, TCN, GCN) | ~30s-5min |
-| `test_pcmci.py` | Test causal discovery | ~2-5min |
-| `test_full_pipeline.py` | End-to-end RCA pipeline | ~5-10min |
 | `test_data_loading.py` | Verify dataset extraction | ~10sec |
 | `test_baselines.py` | Test statistical baselines | ~2-5min |
+| `test_multimodal.py` | Test multimodal V4 model | ~1-2min |
 
 ---
 
@@ -153,11 +148,6 @@ TEST: Traces Encoder - GCN
 ### ModuleNotFoundError: No module named 'torch'
 ```bash
 pip install torch torchvision torchaudio
-```
-
-### ModuleNotFoundError: No module named 'chronos'
-```bash
-pip install chronos-forecasting
 ```
 
 ### FileNotFoundError: RCAEval dataset not found
@@ -171,9 +161,6 @@ Edit `config/experiment_config.yaml`:
 device: 'cpu'
 batch_size: 4
 ```
-
-### Chronos model download slow
-First run downloads ~100MB model from HuggingFace. Be patient!
 
 ---
 

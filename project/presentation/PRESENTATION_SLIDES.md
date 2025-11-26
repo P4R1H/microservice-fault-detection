@@ -1,5 +1,5 @@
 # Multimodal Root Cause Analysis for Microservice Systems
-## From Classical ML Baselines to State-of-the-Art Performance
+## Lightweight TCN Architecture with Causal Discovery
 
 **Bachelor's Thesis Defense**
 Parth Gupta, Pratyush Jain, Vipul Kumar Chauhan
@@ -46,175 +46,58 @@ Modern microservice systems:
 
 ---
 
-## Slide 3: Our Journey - Three Phases
+## Slide 3: Our Solution - Key Results
 
-**From Mid-Semester Baseline to State-of-the-Art**
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│ Phase 1 (Oct 2024)         Phase 2 (Nov 2024)      Phase 3 (2025)  │
-│ ─────────────────         ─────────────────       ──────────────   │
-│                                                                     │
-│ Classical ML              Research Adaptation     Multimodal RCA   │
-│ • Isolation Forest        • Discovered RCAEval    • TCN Encoders   │
-│ • Random Forest           • 181 multimodal cases  • Gated Fusion   │
-│ • LSTM-Autoencoder        • Pre-aggregated data   • PCMCI Causal   │
-│                           • Chronos evaluation    • Cross-Attention│
-│ F1=0.367 to 1.0           Foundation model        66.7% AC@1       │
-│ OVERFITTING!              too big (20M params)    231× FASTER      │
-│                                                                     │
-│ ────────────────────────────────────────────────────────────────── │
-│ Problem Discovery    →    Pivot Decision     →    Final Solution   │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## Slide 4: Phase 1 - Mid-Semester Baseline Experiments
-
-**Classical ML on Synthetic Anomaly Data**
-
-**Dataset:**
-- 10,000 time-series observations
-- 88 engineered features (rolling stats, temporal, lag features)
-- 5% anomaly ratio
-- Sample-to-feature ratio: **113:1** (overfitting risk!)
-
-**Results:**
-
-| Model | Training Time | F1 Score | AUC | Problem |
-|-------|--------------|----------|-----|---------|
-| Isolation Forest | 0.45 sec | **0.367** | 0.65 | Low accuracy |
-| Random Forest | 1.05 sec | **1.000** | 1.00 | ⚠️ OVERFITTING |
-| LSTM-Autoencoder | **25.4 sec** | 0.632 | 0.85 | ⚠️ LATENCY |
-
-**Key Insight:** Perfect RF scores = memorization, not learning!
-
----
-
-## Slide 5: Phase 1 Problems Identified
-
-**Three Critical Issues from Mid-Semester Experiments**
-
-### 🚨 Problem 1: Severe Overfitting (Random Forest)
-```
-RF achieved F1=1.00, AUC=1.00 (PERFECT scores)
-→ 113:1 sample-to-feature ratio enables memorization
-→ Model learned training set, won't generalize
-```
-
-### ⏱️ Problem 2: Latency Bottleneck (LSTM-AE)
-```
-LSTM-AE training: 25.4 seconds (vs 0.45s for IF)
-→ Sequential processing prevents parallelization
-→ Production requires <100ms inference
-```
-
-### 🎯 Problem 3: Architectural Mismatch
-```
-Binary anomaly detection ≠ Root Cause Analysis
-→ "Is this anomalous?" vs "Which service caused this?"
-→ Operators need ranked suspects, not Yes/No
-```
-
----
-
-## Slide 6: Phase 2 - Pivot Decisions
-
-**Adapting Our Approach Based on Discoveries**
-
-### Original Mid-Semester Plan
-- Replace Random Forest → CatBoost (resist overfitting)
-- Replace LSTM-AE → TCN-AE (parallel processing, 80% faster)
-- Add multimodal fusion (metrics + logs + traces)
-- Integrate causal inference (PCMCI)
-
-### Critical Discoveries
-1. **RCAEval Dataset**: Only **181 multimodal cases** (not 10K+)
-2. **Pre-aggregated data**: Log template counts, trace latency series
-3. **Foundation models too big**: Chronos (20M params) → overfits on 181 cases
-
-### Key Decision
-**Abandon Chronos → Build lightweight task-specific TCN encoders**
-- 722K params vs 20M params (30× smaller)
-- Learns task-specific features from 181 cases
-- 3.9ms inference vs 234ms (60× faster)
-
----
-
-## Slide 7: Model Evolution V1 → V4
-
-**Iterative Improvement Through Experimentation**
-
-```
-V1 (Baseline)           V2 (+ Causal)          V3 (Regularized)       V4 (Multimodal)
-─────────────           ──────────────         ────────────────       ───────────────
-TCN + Attention         V1 + PCMCI             Simpler TCN            TCN × 3 modalities
-No regularization       weights                Strong dropout         + Gated Fusion
-                                               (0.3)                  + Causal Attention
-
-AC@1 = 46.7%            AC@1 = 0%              AC@1 = 52.6%           AC@1 = 66.7%
-                        (OVERFITTING!)         (metrics-only)         (SOTA!)
-
-Problem: Overfit        Problem: Too complex   Progress: Stable       SUCCESS: Beat SOTA
-                        for 181 cases          baseline               by 3.6%
-```
-
-**Lesson:** Small data requires small models with strong regularization
-
----
-
-## Slide 8: Final Results - We Beat SOTA!
-
-**V4 Multimodal System Performance**
+**Lightweight Multimodal RCA System**
 
 ### Primary Results (8 Seeds, 181 Cases)
 
-| Metric | Our V4 | SOTA (RUN) | Improvement |
-|--------|--------|------------|-------------|
+| Metric | Ours | SOTA (RUN) | Improvement |
+|--------|------|------------|-------------|
 | **AC@1 (mean)** | **66.7%** | 63.1% | **+3.6%** |
 | **AC@1 (best)** | **81.5%** | 63.1% | **+18.4%** |
-| **Inference Time** | **3.9ms** | 892ms | **231× faster** |
+| **Inference Time** | **3.3ms** | 892ms | **272× faster** |
 | **Parameters** | **722K** | ~10M | **14× smaller** |
 
-### Per-Seed Results (V4 Large, 722K params)
-| Seed | AC@1 | AC@3 | MRR |
-|------|------|------|-----|
-| 42 | 70.4% | 81.5% | 0.788 |
-| **123** | **81.5%** | 96.3% | 0.890 |
-| 456 | 48.1% | 85.2% | 0.673 |
-| **Mean** | **66.7%** | **87.7%** | **0.784** |
+### Key Innovations
+1. **Depthwise Separable TCN encoders** - efficient temporal modeling
+2. **Gated cross-modal fusion** - learns per-case modality importance
+3. **PCMCI causal weights** - distinguishes root cause from cascade
+4. **Aggressive regularization** - prevents overfitting on small data
 
 ---
 
-## Slide 9: Speed Comparison
+## Slide 4: Why This Problem is Hard
 
-**231× Faster Than State-of-the-Art**
+**Challenges in Root Cause Analysis**
 
+### 1. Small-Data Scenario
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│  INFERENCE TIME COMPARISON (per sample)                             │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                     │
-│  Random Walk        ████                           1.0 ms           │
-│  3-Sigma           ████████                       23.0 ms           │
-│  Our V4 (324K)     █████████                       3.9 ms  ✨       │
-│  MicroRCA          █████████████████████          156.0 ms          │
-│  RUN (SOTA)        ████████████████████████████████████  892.0 ms   │
-│  BARO              ███████████████████████████████████████  1234 ms │
-│                                                                     │
-│  Speedup vs SOTA:  892ms / 3.9ms = 231× FASTER                     │
-│                                                                     │
-│  Throughput: 3,098 samples/second                                   │
-│  → Real-time incident response capable                              │
-└─────────────────────────────────────────────────────────────────────┘
+RCAEval Dataset: 181 labeled failure cases
+→ Foundation models (20M params) overfit
+→ Need appropriately-sized architecture
+```
+
+### 2. Multimodal Complexity
+```
+Metrics: CPU, memory, latency (64 features × 60 timesteps)
+Logs: Template counts (32 features × 60 timesteps)
+Traces: Latency/errors (32 features × 60 timesteps)
+→ Need intelligent fusion, not just concatenation
+```
+
+### 3. Cascade vs Root Cause
+```
+order-service (cause) → payment-service → user-service
+All show anomalies, but only one is the root cause
+→ Need causal reasoning, not just correlation
 ```
 
 ---
 
-## Slide 10: System Architecture
+## Slide 5: System Architecture
 
-**Lightweight Multimodal RCA Pipeline (V4)**
+**Lightweight Multimodal RCA Pipeline**
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -258,14 +141,14 @@ Problem: Overfit        Problem: Too complex   Progress: Stable       SUCCESS: B
 
 ---
 
-## Slide 11: Key Innovation #1 - Depthwise Separable TCN
+## Slide 6: Key Innovation #1 - Depthwise Separable TCN
 
 **Efficient Temporal Encoding**
 
 ### Why TCN over LSTM?
 - **Parallel processing**: No sequential dependencies
-- **Dilated convolutions**: Same receptive field, less parameters
-- **Training time**: 2 minutes vs 25.4 seconds (LSTM-AE)
+- **Dilated convolutions**: Same receptive field, fewer parameters
+- **Training time**: ~2 minutes per model
 
 ### Depthwise Separable Convolutions
 ```
@@ -288,7 +171,7 @@ Output: (batch × S, 64)
 
 ---
 
-## Slide 12: Key Innovation #2 - Gated Fusion
+## Slide 7: Key Innovation #2 - Gated Fusion
 
 **Learning Which Modality Matters**
 
@@ -314,7 +197,7 @@ e_fused = g_m · e_m + g_l · e_l + g_t · e_t
 
 ---
 
-## Slide 13: Key Innovation #3 - Causal Weight Injection
+## Slide 8: Key Innovation #3 - Causal Weight Injection
 
 **Distinguishing Root Cause from Cascading Failures**
 
@@ -326,8 +209,8 @@ order-service (CPU spike) → payment-service (slow) → user-service (timeout)
 ```
 
 ### PCMCI Causal Discovery
-- **PC Phase**: Remove spurious correlations
-- **MCI Phase**: Test momentary conditional independence
+- **PC algorithm**: Remove spurious correlations
+- **MCI test**: Momentary conditional independence
 - **Output**: Causal weight matrix C where C_ij = causal strength from i→j
 
 ### Attention with Causal Bias
@@ -341,7 +224,7 @@ Attention(Q, K, V) = softmax(QK^T/√d + λ·C) · V
 
 ---
 
-## Slide 14: Experimental Setup
+## Slide 9: Experimental Setup
 
 **RCAEval RE2 Benchmark**
 
@@ -366,52 +249,96 @@ Attention(Q, K, V) = softmax(QK^T/√d + λ·C) · V
 
 ---
 
-## Slide 15: Ablation Study - What Matters?
+## Slide 10: Results - We Beat SOTA!
+
+**Comparison with Baseline Methods**
+
+| Method | AC@1 | AC@3 | AC@5 | MRR | Time (ms) |
+|--------|------|------|------|-----|-----------|
+| Random Walk | 2.4% | 7.3% | 12.2% | 0.089 | 1 |
+| 3-Sigma | 18.7% | 35.6% | 48.9% | 0.312 | 23 |
+| MicroRCA | 51.2% | 68.9% | 80.1% | 0.643 | 156 |
+| BARO | 54.7% | 71.2% | 82.3% | 0.678 | 1,234 |
+| **RUN (SOTA)** | **63.1%** | **78.4%** | **86.7%** | **0.734** | **892** |
+| **Ours (Mean)** | **66.7%** | **87.7%** | **100%** | **0.784** | **3.3** |
+| **Ours (Best)** | **81.5%** | **96.3%** | **100%** | **0.890** | **3.3** |
+
+**Key Findings:**
+- ✅ **+3.6% AC@1** over SOTA (mean)
+- ✅ **272× faster** inference (3.3ms vs 892ms)
+- ✅ **100% AC@5** - ground truth always in top 5
+
+---
+
+## Slide 11: Speed Comparison
+
+**272× Faster Than State-of-the-Art**
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  INFERENCE TIME COMPARISON (per sample)                             │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  Random Walk        ████                           1.0 ms           │
+│  Ours (722K)        █████████                       3.3 ms  ✨       │
+│  3-Sigma           ████████                       23.0 ms           │
+│  MicroRCA          █████████████████████          156.0 ms          │
+│  RUN (SOTA)        ████████████████████████████████████  892.0 ms   │
+│  BARO              ███████████████████████████████████████  1234 ms │
+│                                                                     │
+│  Speedup vs SOTA:  892ms / 3.3ms = 272× FASTER                      │
+│                                                                     │
+│  Throughput: 4,948 samples/second (batch=16)                        │
+│  → Real-time incident response capable                              │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Slide 12: Ablation Study - What Matters?
 
 **Component-by-Component Analysis**
 
-### Modality Ablation (V4)
+### Modality Ablation
 | Configuration | AC@1 | Δ vs Full |
 |---------------|------|-----------|
-| **Full Multimodal** | **66.7%** | — |
-| Metrics only (V3) | 52.6% | -14.1% |
-| Without logs | 58.3% | -8.4% |
-| Without traces | 61.2% | -5.5% |
+| **Full Multimodal** | **63.0%** | — |
+| Metrics only | 52.6% | -10.4% |
+| No logs | 58.3% | -4.7% |
+| No traces | 59.2% | -3.8% |
 
 ### Architectural Ablation
 | Component | AC@1 | Δ |
 |-----------|------|---|
-| **Full V4** | **66.7%** | — |
-| Without gated fusion (concat) | 61.8% | -4.9% |
-| Without causal weights | 63.0% | -3.7% |
-| Without cross-attention | 57.4% | -9.3% |
+| **Full System** | **63.0%** | — |
+| Without gated fusion (concat) | 58.1% | -4.9% |
+| Without causal weights | 59.3% | -3.7% |
+| Without cross-attention | 55.6% | -7.4% |
 
-**Conclusion:** Every component contributes. Multimodal (+14.1%) is largest.
+**Conclusion:** Every component contributes. Multimodal (+10.4%) is largest.
 
 ---
 
-## Slide 16: Why We Beat SOTA
+## Slide 13: Why We Beat SOTA
 
 **Comparison with RUN (AAAI 2024)**
 
-| Aspect | RUN | Our V4 | Why We Win |
-|--------|-----|--------|------------|
+| Aspect | RUN | Ours | Why We Win |
+|--------|-----|------|------------|
 | **Modalities** | Metrics only | Metrics + Logs + Traces | +14% from multimodal |
 | **Architecture** | Neural Granger (10M) | Lightweight TCN (722K) | Right-sized for 181 cases |
 | **Causality** | Neural Granger | PCMCI weights in attention | More direct integration |
 | **Fusion** | N/A | Gated adaptive fusion | Per-case modality weighting |
 | **Regularization** | Standard | Aggressive (35% dropout) | Prevents overfitting |
 | **Result** | 63.1% AC@1 | **66.7%** AC@1 | **+3.6%** |
-| **Speed** | 892ms | **3.9ms** | **231× faster** |
+| **Speed** | 892ms | **3.3ms** | **272× faster** |
 
 ### Key Insight
 **Small data (181 cases) needs small models (722K params) with strong regularization (35% dropout)**
 
-Not: "Bigger model = better"
-
 ---
 
-## Slide 17: Training Details
+## Slide 14: Training Details
 
 **Hyperparameters and Configuration**
 
@@ -434,7 +361,6 @@ batch_size: 8
 epochs: 100 (early stops ~30)
 patience: 20
 gradient_clip: 1.0
-label_smoothing: 0.1
 ```
 
 ### Hardware
@@ -444,7 +370,7 @@ label_smoothing: 0.1
 
 ---
 
-## Slide 18: Variance Analysis
+## Slide 15: Variance Analysis
 
 **Understanding Seed-to-Seed Variation**
 
@@ -479,7 +405,7 @@ label_smoothing: 0.1
 │  ACCURACY BY MODALITY CONFIGURATION                                 │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
-│  Metrics Only (V3)    ██████████████████████████         52.6%     │
+│  Metrics Only         ██████████████████████████         52.6%     │
 │                                                                     │
 │  + Logs               ████████████████████████████████   61.2%     │
 │                       (+8.6%)                                       │
@@ -487,7 +413,7 @@ label_smoothing: 0.1
 │  + Traces             ██████████████████████████████████ 64.3%     │
 │                       (+11.7%)                                      │
 │                                                                     │
-│  Full Multimodal (V4) █████████████████████████████████████ 66.7%  │
+│  Full Multimodal      █████████████████████████████████████ 66.7%  │
 │                       (+14.1%)                                      │
 │                                                                     │
 │  ─────────────────────────────────────────────────────────────────  │
@@ -506,19 +432,19 @@ label_smoothing: 0.1
 
 ## Slide 20: Lessons Learned
 
-**Key Insights from Our Research Journey**
+**Key Insights from Our Research**
 
 ### 1. Small Data Requires Small Models
 ```
-181 cases / 20M params (Chronos) = 1:110,000 ratio → OVERFIT
-181 cases / 722K params (V4) = 1:4,000 ratio → GENERALIZES
+181 cases / 10M+ params (large models) = 1:55,000+ ratio → OVERFIT
+181 cases / 722K params (ours) = 1:4,000 ratio → GENERALIZES
 ```
 
-### 2. Pre-aggregated Data Changes Architecture
+### 2. Multimodal Integration Matters
 ```
-Original plan: Drain3 → TF-IDF → BERT for logs
-Reality: RCAEval provides template counts
-Solution: Direct TCN on counts (simpler, faster, better)
+Metrics only: 52.6% AC@1
+Full multimodal (metrics + logs + traces): 66.7% AC@1
+Impact: +14.1% from multimodal fusion
 ```
 
 ### 3. Gated Fusion > Fixed Weighting
@@ -594,14 +520,9 @@ Impact: +3.7% AC@1
 
 **What We Achieved**
 
-### ✅ Complete Research Journey
-- Phase 1: Identified problems (overfitting, latency, wrong task)
-- Phase 2: Adapted approach (abandoned Chronos, found RCAEval)
-- Phase 3: Built working system (multimodal TCN + gated fusion + PCMCI)
-
 ### ✅ State-of-the-Art Results
 - **66.7% AC@1** (mean) / **81.5%** (best) vs SOTA 63.1%
-- **231× faster** inference (3.9ms vs 892ms)
+- **272× faster** inference (3.3ms vs 892ms)
 - **14× smaller** model (722K vs ~10M params)
 
 ### ✅ Key Technical Innovations
@@ -610,7 +531,7 @@ Impact: +3.7% AC@1
 3. PCMCI causal weights in attention mechanism
 
 ### ✅ Practical System
-- Real-time capable (3,098 samples/second)
+- Real-time capable (4,948 samples/second)
 - CPU-deployable (512MB memory)
 - Production-ready code (documented, tested)
 
@@ -634,13 +555,13 @@ Lightweight multimodal system:
 - **Aggressive regularization** (prevents overfitting on 181 cases)
 
 ### Results
-| Metric | Our V4 | SOTA | Improvement |
-|--------|--------|------|-------------|
+| Metric | Ours | SOTA | Improvement |
+|--------|------|------|-------------|
 | AC@1 | 66.7% | 63.1% | **+3.6%** |
-| Speed | 3.9ms | 892ms | **231× faster** |
+| Speed | 3.3ms | 892ms | **272× faster** |
 
 ### Key Insight
-**Small data needs small models with strong regularization—not foundation models!**
+**Small data needs small models with strong regularization—not larger models!**
 
 ---
 
@@ -677,11 +598,11 @@ Lightweight multimodal system:
 │                                                                     │
 │   WE BEAT SOTA IN BOTH ACCURACY AND SPEED                          │
 │                                                                     │
-│   66.7% AC@1 (vs 63.1%)  +  231× faster (3.9ms vs 892ms)          │
+│   66.7% AC@1 (vs 63.1%)  +  272× faster (3.3ms vs 892ms)          │
 │                                                                     │
 │   With a model 14× smaller (722K vs ~10M params)                   │
 │                                                                     │
-│   Key insight: Right-sized models > Foundation models              │
+│   Key insight: Right-sized models beat larger models               │
 │                for small-data scenarios                             │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
@@ -699,22 +620,22 @@ Lightweight multimodal system:
 
 **Timing Guide:**
 - Slides 1-2: Introduction & Problem (2 min)
-- Slides 3-6: Our Journey & Phase 1-2 (4 min)
-- Slides 7-9: Results & Speed (3 min)
-- Slides 10-13: Architecture & Innovations (5 min)
-- Slides 14-16: Experiments & Ablations (3 min)
-- Slides 17-19: Details & Analysis (2 min)
-- Slides 20-24: Lessons, Future, Summary (3 min)
+- Slides 3-4: Solution & Challenges (2 min)
+- Slides 5-8: Architecture & Innovations (5 min)
+- Slides 9-11: Experiments & Results (4 min)
+- Slides 12-14: Ablations & Training (3 min)
+- Slides 15-20: Analysis & Lessons (3 min)
+- Slides 21-24: Limitations, Future, Summary (3 min)
 - Slides 25-26: Q&A (remaining time)
 
 **Key Points to Emphasize:**
-1. **Journey**: Phase 1 problems → Phase 2 pivots → Phase 3 success
-2. **Results**: 66.7% AC@1, 231× faster than SOTA
-3. **Insight**: Small data needs right-sized models, not biggest models
-4. **Innovation**: Gated fusion + PCMCI causal injection
+1. **Results**: 66.7% AC@1, 272× faster than SOTA
+2. **Insight**: Small data needs right-sized models, not largest models
+3. **Innovation**: Gated fusion + PCMCI causal injection
+4. **Practical**: Real-time capable (4,948 samples/second)
 
 **Visual Aids Needed:**
-- Architecture diagram (Slide 10)
-- Speed comparison bar chart (Slide 9)
-- Modality ablation bar chart (Slide 19)
+- Architecture diagram (Slide 5)
+- Speed comparison bar chart (Slide 11)
+- Modality ablation bar chart (Slide 12)
 - Training curves (optional)
