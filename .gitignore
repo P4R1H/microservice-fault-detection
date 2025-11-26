@@ -42,8 +42,10 @@ env/
 *.ipynb
 
 # Data files - DO NOT COMMIT DATASETS
-data/
-!project/src/data/  # Exception: keep source code in src/data/
+/data/
+# Keep project/src/data/ source code (Python modules)
+!project/src/data/
+project/data/RCAEval/
 *.csv
 *.zip
 *.tar.gz
@@ -83,7 +85,6 @@ Thumbs.db
 .DS_Store
 
 # Project specific
-project/data/
 project/outputs/
 project/experiments/
 project/models/
