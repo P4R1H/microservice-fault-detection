@@ -378,8 +378,8 @@ We compare against methods from RCAEval benchmark:
 
 **Hardware:**
 - GPU: NVIDIA RTX 4070 Laptop GPU (8GB VRAM)
-- CPU: AMD Ryzen 9
-- RAM: 16GB
+- CPU: Intel Ultra 9
+- RAM: 32GB
 
 **Software:**
 - Python 3.10, PyTorch 2.0
