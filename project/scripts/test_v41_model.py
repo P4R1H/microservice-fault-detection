@@ -30,12 +30,10 @@ def test_model():
         n_metric_features=n_metric_feat,
         n_log_features=n_log_feat,
         n_trace_features=n_trace_feat,
-        logs_encoder_type='tfidf',
-        traces_encoder_type='tcn'
+        logs_encoder_type='tfidf'
     )
     
     print(f"   Logs encoder type: {model.logs_encoder_type}")
-    print(f"   Traces encoder type: {model.traces_encoder_type}")
     
     # Count parameters
     print("\n2. Model parameters by component:")
@@ -82,8 +80,7 @@ def test_model():
         n_metric_features=n_metric_feat,
         n_log_features=n_log_feat,
         n_trace_features=n_trace_feat,
-        logs_encoder_type='tcn',
-        traces_encoder_type='tcn'
+        logs_encoder_type='tcn'
     )
     params_tcn = model_tcn.count_parameters()
     

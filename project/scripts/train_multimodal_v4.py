@@ -205,7 +205,6 @@ def train(args):
     # Create model
     print("\nCreating model...")
     print(f"  Logs encoder: {args.logs_encoder}")
-    print(f"  Traces encoder: {args.traces_encoder}")
     
     model = create_multimodal_model(
         n_services=n_services,
@@ -215,8 +214,7 @@ def train(args):
         hidden_dim=args.hidden_dim,
         embed_dim=args.embed_dim,
         dropout=args.dropout,
-        logs_encoder_type=args.logs_encoder,
-        traces_encoder_type=args.traces_encoder
+        logs_encoder_type=args.logs_encoder
     ).to(device)
     
     # Set causal weight manually (not in factory)
@@ -371,10 +369,7 @@ def main():
     parser.add_argument('--causal-weight', type=float, default=0.3)
     parser.add_argument('--logs-encoder', type=str, default='tfidf',
                         choices=['tcn', 'tfidf', 'gemini'],
-                        help='Logs encoder type: tcn (V4), tfidf (V4.1), gemini (V5)')
-    parser.add_argument('--traces-encoder', type=str, default='tcn',
-                        choices=['tcn', 'gcn', 'gat'],
-                        help='Traces encoder type: tcn (V4), gcn (V4.2), gat')
+                        help='Logs encoder type: tcn (V4), tfidf (V4.1), gemini (V4.3)')
     
     # Training
     parser.add_argument('--epochs', type=int, default=100)
