@@ -54,17 +54,6 @@ project/data/RCAEval/
 *.pickle
 
 # Model checkpoints and outputs (but not src/models/ source code)
-/models/
-/checkpoints/
-/outputs/
-/runs/
-/logs/
-*.pt
-*.pth
-*.ckpt
-*.pth
-*.ckpt
-*.safetensors
 
 # Experiments and results
 experiments/
@@ -83,14 +72,6 @@ mlruns/
 # OS
 Thumbs.db
 .DS_Store
-
-# Project specific
-project/outputs/
-project/experiments/
-project/models/
-project/checkpoints/
-project/logs/
-project/wandb/
 
 # Config overrides (keep defaults tracked)
 project/config/*_override.yaml

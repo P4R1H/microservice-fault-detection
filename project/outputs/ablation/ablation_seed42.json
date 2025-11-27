@@ -1,0 +1,146 @@
+{
+  "metadata": {
+    "description": "Ablation study for Multimodal V4 RCA Model",
+    "seed": 42,
+    "embed_dim": 128,
+    "hidden_dim": 32,
+    "n_train": 127,
+    "n_val": 27,
+    "n_test": 27,
+    "date": "2025-11-26T15:37:44.157298"
+  },
+  "summary": [
+    {
+      "variant": "Full V4 Multimodal",
+      "ac@1": 0.6296296296296297,
+      "delta_vs_full": 0.0,
+      "mrr": 0.7469135802469135
+    },
+    {
+      "variant": "Metrics Only (no logs/traces)",
+      "ac@1": 0.6666666666666666,
+      "delta_vs_full": 0.03703703703703698,
+      "mrr": 0.7993827160493828
+    },
+    {
+      "variant": "No Gated Fusion (concat)",
+      "ac@1": 0.5925925925925926,
+      "delta_vs_full": -0.03703703703703709,
+      "mrr": 0.7493827160493828
+    },
+    {
+      "variant": "No Causal Weights",
+      "ac@1": 0.6666666666666666,
+      "delta_vs_full": 0.03703703703703698,
+      "mrr": 0.7932098765432097
+    },
+    {
+      "variant": "No Cross-Service Attention",
+      "ac@1": 0.6666666666666666,
+      "delta_vs_full": 0.03703703703703698,
+      "mrr": 0.7771604938271603
+    }
+  ],
+  "variants": [
+    {
+      "variant": "Full V4 Multimodal",
+      "config": {
+        "use_logs": true,
+        "use_traces": true,
+        "use_gated_fusion": true,
+        "use_causal": true,
+        "use_attention": true
+      },
+      "n_params": 324036,
+      "best_epoch": 43,
+      "best_val_ac@1": 0.5925925925925926,
+      "test": {
+        "ac@1": 0.6296296296296297,
+        "ac@3": 0.8518518518518519,
+        "ac@5": 1.0,
+        "mrr": 0.7469135802469135,
+        "avg_rank": 1.8518518518518519
+      }
+    },
+    {
+      "variant": "Metrics Only (no logs/traces)",
+      "config": {
+        "use_logs": false,
+        "use_traces": false,
+        "use_gated_fusion": true,
+        "use_causal": true,
+        "use_attention": true
+      },
+      "n_params": 324036,
+      "best_epoch": 45,
+      "best_val_ac@1": 0.5555555555555556,
+      "test": {
+        "ac@1": 0.6666666666666666,
+        "ac@3": 0.8888888888888888,
+        "ac@5": 1.0,
+        "mrr": 0.7993827160493828,
+        "avg_rank": 1.5925925925925926
+      }
+    },
+    {
+      "variant": "No Gated Fusion (concat)",
+      "config": {
+        "use_logs": true,
+        "use_traces": true,
+        "use_gated_fusion": false,
+        "use_causal": true,
+        "use_attention": true
+      },
+      "n_params": 324036,
+      "best_epoch": 6,
+      "best_val_ac@1": 0.6666666666666666,
+      "test": {
+        "ac@1": 0.5925925925925926,
+        "ac@3": 0.8518518518518519,
+        "ac@5": 1.0,
+        "mrr": 0.7493827160493828,
+        "avg_rank": 1.8148148148148149
+      }
+    },
+    {
+      "variant": "No Causal Weights",
+      "config": {
+        "use_logs": true,
+        "use_traces": true,
+        "use_gated_fusion": true,
+        "use_causal": false,
+        "use_attention": true
+      },
+      "n_params": 324036,
+      "best_epoch": 42,
+      "best_val_ac@1": 0.5555555555555556,
+      "test": {
+        "ac@1": 0.6666666666666666,
+        "ac@3": 0.8888888888888888,
+        "ac@5": 1.0,
+        "mrr": 0.7932098765432097,
+        "avg_rank": 1.6296296296296295
+      }
+    },
+    {
+      "variant": "No Cross-Service Attention",
+      "config": {
+        "use_logs": true,
+        "use_traces": true,
+        "use_gated_fusion": true,
+        "use_causal": true,
+        "use_attention": false
+      },
+      "n_params": 191556,
+      "best_epoch": 31,
+      "best_val_ac@1": 0.5185185185185185,
+      "test": {
+        "ac@1": 0.6666666666666666,
+        "ac@3": 0.8888888888888888,
+        "ac@5": 1.0,
+        "mrr": 0.7771604938271603,
+        "avg_rank": 1.7777777777777777
+      }
+    }
+  ]
+}

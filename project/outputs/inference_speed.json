@@ -1,0 +1,71 @@
+{
+  "metadata": {
+    "description": "Inference speed benchmark for Multimodal V4 RCA Model",
+    "device": "cuda",
+    "gpu_name": "NVIDIA GeForce RTX 4070 Laptop GPU",
+    "num_warmup": 5,
+    "num_runs": 100,
+    "date": "2025-11-26T21:30:20.747960"
+  },
+  "our_models": {
+    "V4 Multimodal (324K params)": {
+      "mean_ms": 3.7763609999092296,
+      "std_ms": 0.48095049590384975,
+      "min_ms": 3.2540999964112416,
+      "max_ms": 6.883199996082112,
+      "mean_sec": 0.0037763609999092295,
+      "speedup_vs_sota": 236.20623134849677
+    },
+    "V4 Multimodal (722K params)": {
+      "mean_ms": 3.996858000609791,
+      "std_ms": 0.603058795615579,
+      "min_ms": 3.397899999981746,
+      "max_ms": 7.616599992616102,
+      "mean_sec": 0.003996858000609791,
+      "speedup_vs_sota": 223.17530416740095
+    }
+  },
+  "baselines": {
+    "Random Walk": {
+      "time_sec": 0.001,
+      "source": "literature/RCAEval paper"
+    },
+    "3-Sigma": {
+      "time_sec": 0.023,
+      "source": "literature/RCAEval paper"
+    },
+    "MicroRCA": {
+      "time_sec": 0.156,
+      "source": "literature/RCAEval paper"
+    },
+    "RUN (SOTA)": {
+      "time_sec": 0.892,
+      "source": "literature/RCAEval paper"
+    },
+    "BARO": {
+      "time_sec": 1.234,
+      "source": "literature/RCAEval paper"
+    },
+    "ARIMA": {
+      "time_sec": 1.876,
+      "source": "literature/RCAEval paper"
+    },
+    "Granger-Lasso": {
+      "time_sec": 2.341,
+      "source": "literature/RCAEval paper"
+    }
+  },
+  "batch_inference": {
+    "batch_size": 16,
+    "total_batch_time_ms": 3.8826130000234116,
+    "per_sample_amortized_ms": 0.24266331250146322,
+    "throughput_samples_per_sec": 4120.9360809082755
+  },
+  "summary": {
+    "sota_method": "RUN (AAAI 2024)",
+    "sota_time_sec": 0.892,
+    "our_best_time_sec": 0.0037763609999092295,
+    "speedup_factor": 236.20623134849677,
+    "batch_throughput": 4120.9360809082755
+  }
+}

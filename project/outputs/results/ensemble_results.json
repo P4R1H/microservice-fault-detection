@@ -1,0 +1,12 @@
+{
+  "metadata": {
+    "description": "Ensemble Evaluation Results",
+    "evaluation_date": "2025-11-26T21:03:38.779423",
+    "device": "cuda"
+  },
+  "ensembles": [],
+  "best": {
+    "models": null,
+    "ac@1": 0
+  }
+}
