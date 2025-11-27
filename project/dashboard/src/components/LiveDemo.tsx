@@ -241,8 +241,32 @@ The ${selectedCase.fault_type.replace('_', ' ')} fault was detected in the ${sel
 
   return (
     <section id="demo" className="relative py-32 overflow-hidden">
-      {/* Background */}
+      {/* Background gradient */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.05)_0%,transparent_60%)]" />
+      
+      {/* Grid pattern overlay */}
+      <div 
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, rgb(255 255 255) 1px, transparent 1px),
+            linear-gradient(to bottom, rgb(255 255 255) 1px, transparent 1px)
+          `,
+          backgroundSize: '60px 60px',
+        }}
+      />
+      
+      {/* Cross pattern accent */}
+      <div 
+        className="absolute inset-0 opacity-[0.02]"
+        style={{
+          backgroundImage: `
+            linear-gradient(45deg, rgb(59 130 246) 1px, transparent 1px),
+            linear-gradient(-45deg, rgb(59 130 246) 1px, transparent 1px)
+          `,
+          backgroundSize: '40px 40px',
+        }}
+      />
       
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         {/* Section header */}
@@ -462,62 +486,56 @@ The ${selectedCase.fault_type.replace('_', ' ')} fault was detected in the ${sel
               )}
             </div>
 
-            {/* AI Explanation Card */}
-            <AnimatePresence>
-              {(explanation || isLoadingExplanation) && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="bento-card p-6"
-                >
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                      <Sparkles className="w-4 h-4 text-blue-400" />
-                    </div>
-                    <h3 className="text-base font-semibold text-white">AI Analysis</h3>
-                    <span className="text-xs text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded-full">Gemini</span>
-                  </div>
+            {/* AI Analysis Card - Always visible */}
+            <div className="bento-card px-6 py-4 transition-all duration-300">
+              <div className="flex items-center gap-3">
+                <div className="w-5 h-5 flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-purple-400" />
+                </div>
+                <span className="font-semibold text-white">AI Analysis</span>
+                <span className="text-[10px] text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded-full">Gemini</span>
+                {!explanation && !isLoadingExplanation && (
+                  <span className="text-xs text-zinc-500 ml-auto">Awaiting diagnosis</span>
+                )}
+              </div>
 
-                  {isLoadingExplanation ? (
-                    <div className="flex items-center gap-3 text-zinc-400 py-4">
-                      <Loader2 className="w-5 h-5 animate-spin text-blue-400" />
-                      <span className="text-sm">Generating analysis...</span>
-                    </div>
-                  ) : explanation ? (
-                    <div className="prose prose-invert prose-sm max-w-none text-sm">
-                      {explanation.split('\n').map((line, i) => {
-                        if (line.startsWith('## ')) {
-                          return (
-                            <h4 key={i} className="text-blue-400 font-semibold mt-3 mb-2 text-sm">
-                              {line.replace('## ', '')}
-                            </h4>
-                          );
-                        }
-                        if (line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
-                          return (
-                            <p key={i} className="ml-4 text-zinc-400 my-0.5 text-sm">
-                              • {line.trim().slice(2)}
-                            </p>
-                          );
-                        }
-                        if (/^\d+\.\s/.test(line.trim())) {
-                          return (
-                            <p key={i} className="ml-4 text-zinc-400 my-0.5 text-sm">
-                              {line.trim()}
-                            </p>
-                          );
-                        }
-                        if (line.trim()) {
-                          return <p key={i} className="text-zinc-300 my-1 text-sm">{line}</p>;
-                        }
-                        return null;
-                      })}
-                    </div>
-                  ) : null}
-                </motion.div>
-              )}
-            </AnimatePresence>
+              {isLoadingExplanation ? (
+                <div className="flex items-center gap-3 text-zinc-400 mt-4 pt-4 border-t border-zinc-800">
+                  <Loader2 className="w-5 h-5 animate-spin text-purple-400" />
+                  <span className="text-sm">Generating analysis...</span>
+                </div>
+              ) : explanation ? (
+                <div className="prose prose-invert prose-sm max-w-none text-sm mt-4 pt-4 border-t border-zinc-800">
+                  {explanation.split('\n').map((line, i) => {
+                    if (line.startsWith('## ')) {
+                      return (
+                        <h4 key={i} className="text-purple-400 font-semibold mt-3 mb-2 text-sm">
+                          {line.replace('## ', '')}
+                        </h4>
+                      );
+                    }
+                    if (line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
+                      return (
+                        <p key={i} className="ml-4 text-zinc-400 my-0.5 text-sm">
+                          • {line.trim().slice(2)}
+                        </p>
+                      );
+                    }
+                    if (/^\d+\.\s/.test(line.trim())) {
+                      return (
+                        <p key={i} className="ml-4 text-zinc-400 my-0.5 text-sm">
+                          {line.trim()}
+                        </p>
+                      );
+                    }
+                    if (line.trim()) {
+                      return <p key={i} className="text-zinc-300 my-1 text-sm">{line}</p>;
+                    }
+                    return null;
+                  })}
+                </div>
+              ) : null}
+            </div>
           </div>
         </motion.div>
       </div>

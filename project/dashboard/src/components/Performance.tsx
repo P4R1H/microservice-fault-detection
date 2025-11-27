@@ -53,7 +53,7 @@ export function Performance() {
           className="text-center mb-12"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Precision <span className="text-gradient-italic">Performance</span>
+            Precision <span className="text-gradient font-bold">Performance</span>
           </h2>
           <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
             Our model is evaluated against state-of-the-art baselines on the RCAEval benchmark
@@ -206,29 +206,31 @@ export function Performance() {
         >
           {[
             {
-              icon: '🎯',
+              Icon: Target,
               title: 'High Accuracy',
               description: '88.9% ensemble (92.6% best single)',
               color: 'blue',
             },
             {
-              icon: '⚡',
+              Icon: Clock,
               title: 'Real-time Speed',
               description: '3.3-15ms latency enables instant diagnosis',
               color: 'amber',
             },
             {
-              icon: '🔮',
+              Icon: TrendingUp,
               title: 'Explainable',
               description: 'LLM-powered insights for actionable remediation',
               color: 'purple',
             },
-          ].map((feature, index) => (
+          ].map((feature) => (
             <div
               key={feature.title}
               className="bento-card p-6 text-center group hover:border-blue-500/30 transition-colors"
             >
-              <div className="text-4xl mb-4">{feature.icon}</div>
+              <div className={`w-14 h-14 rounded-2xl bg-${feature.color}-500/20 flex items-center justify-center mx-auto mb-4`}>
+                <feature.Icon className={`w-7 h-7 text-${feature.color}-400`} />
+              </div>
               <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
               <p className="text-sm text-zinc-400">{feature.description}</p>
             </div>
