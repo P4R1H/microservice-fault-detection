@@ -39,10 +39,13 @@ sys.path.insert(0, str(PROJECT_ROOT))
 # Configuration
 # ============================================================================
 
-# Best model checkpoint (seed 456 = 92.6% AC@1)
+# Baseline model checkpoints (PCMCI only)
 BEST_MODEL_PATH = "outputs/models/v4_s456.pt"
-# Alternative: seed 123 (77.8% AC@1)
 ALT_MODEL_PATH = "outputs/models/v4_s123.pt"
+
+# LLM Prior model checkpoints (PCMCI + LLM causal prior)
+BEST_LLM_MODEL_PATH = "outputs/models/v4_llm_s123.pt"
+ALT_LLM_MODEL_PATH = "outputs/models/v4_llm_s456.pt"
 
 DATA_ROOT = "data/RCAEval"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
@@ -72,31 +75,50 @@ def format_percentage(value: float) -> str:
     return f"{value * 100:.1f}%"
 
 
-def get_model_path() -> str:
-    """Get the best available model path."""
-    best_path = PROJECT_ROOT / BEST_MODEL_PATH
-    alt_path = PROJECT_ROOT / ALT_MODEL_PATH
+def get_model_path(use_llm_prior: bool = False) -> str:
+    """Get the best available model path.
+    
+    Args:
+        use_llm_prior: If True, return LLM prior model path
+    """
+    if use_llm_prior:
+        best_path = PROJECT_ROOT / BEST_LLM_MODEL_PATH
+        alt_path = PROJECT_ROOT / ALT_LLM_MODEL_PATH
+        pattern = "v4_llm_s*.pt"
+    else:
+        best_path = PROJECT_ROOT / BEST_MODEL_PATH
+        alt_path = PROJECT_ROOT / ALT_MODEL_PATH
+        pattern = "v4_s*.pt"
     
     if best_path.exists():
         return str(best_path)
     elif alt_path.exists():
         return str(alt_path)
     else:
-        # Find any v4 model
+        # Find any matching model
         models_dir = PROJECT_ROOT / "outputs" / "models"
-        for f in models_dir.glob("v4_s*.pt"):
-            return str(f)
+        for f in models_dir.glob(pattern):
+            # Skip LLM models when looking for baseline and vice versa
+            if use_llm_prior and "_llm_" in f.name:
+                return str(f)
+            elif not use_llm_prior and "_llm_" not in f.name:
+                return str(f)
     
-    raise FileNotFoundError("No trained model found! Please train a model first.")
+    model_type = "LLM prior" if use_llm_prior else "baseline"
+    raise FileNotFoundError(f"No {model_type} model found! Please train a model first.")
 
 
 # ============================================================================
 # Demo Modules
 # ============================================================================
 
-def demo_evaluate(verbose: bool = True) -> Dict:
+def demo_evaluate(verbose: bool = True, use_llm_prior: bool = False) -> Dict:
     """
     Evaluate the best model on test set.
+    
+    Args:
+        verbose: Whether to print detailed output
+        use_llm_prior: Whether to use LLM prior model
     
     Returns:
         Dict with evaluation metrics
@@ -105,11 +127,13 @@ def demo_evaluate(verbose: bool = True) -> Dict:
     from src.models.rca_v4_multimodal import create_multimodal_model
     from src.causal.pcmci import CausalWeightComputer
     
-    print_header("MODEL EVALUATION")
+    model_type = "LLM PRIOR" if use_llm_prior else "BASELINE"
+    print_header(f"MODEL EVALUATION ({model_type})")
     
-    model_path = get_model_path()
+    model_path = get_model_path(use_llm_prior)
     print(f"📁 Model: {Path(model_path).name}")
     print(f"🖥️  Device: {DEVICE}")
+    print(f"🧠 Mode: {'PCMCI + LLM Prior' if use_llm_prior else 'PCMCI Only'}")
     
     # Load checkpoint
     checkpoint = torch.load(model_path, map_location=DEVICE, weights_only=False)
@@ -220,13 +244,14 @@ def demo_evaluate(verbose: bool = True) -> Dict:
     return results
 
 
-def demo_inference(num_samples: int = 5, use_llm: bool = True) -> List[Dict]:
+def demo_inference(num_samples: int = 5, use_llm: bool = True, use_llm_prior: bool = False) -> List[Dict]:
     """
     Run inference on test samples with optional LLM explanations.
     
     Args:
         num_samples: Number of samples to process
         use_llm: Whether to generate LLM explanations
+        use_llm_prior: Whether to use LLM prior model
     
     Returns:
         List of inference results
@@ -234,12 +259,14 @@ def demo_inference(num_samples: int = 5, use_llm: bool = True) -> List[Dict]:
     from src.data.multimodal_data import create_multimodal_loaders
     from src.models.rca_v4_multimodal import create_multimodal_model
     
-    print_header("INFERENCE DEMO")
+    model_type = "LLM PRIOR" if use_llm_prior else "BASELINE"
+    print_header(f"INFERENCE DEMO ({model_type})")
     
-    model_path = get_model_path()
+    model_path = get_model_path(use_llm_prior)
     print(f"📁 Model: {Path(model_path).name}")
     print(f"🔢 Samples: {num_samples}")
     print(f"🤖 LLM Explanations: {'Yes' if use_llm else 'No'}")
+    print(f"🧠 Mode: {'PCMCI + LLM Prior' if use_llm_prior else 'PCMCI Only'}")
     
     # Load model
     checkpoint = torch.load(model_path, map_location=DEVICE, weights_only=False)
@@ -351,9 +378,12 @@ def demo_inference(num_samples: int = 5, use_llm: bool = True) -> List[Dict]:
     return results
 
 
-def demo_speed() -> Dict:
+def demo_speed(use_llm_prior: bool = False) -> Dict:
     """
     Benchmark inference speed.
+    
+    Args:
+        use_llm_prior: Whether to use LLM prior model
     
     Returns:
         Dict with speed metrics
@@ -361,11 +391,13 @@ def demo_speed() -> Dict:
     from src.data.multimodal_data import create_multimodal_loaders
     from src.models.rca_v4_multimodal import create_multimodal_model
     
-    print_header("SPEED BENCHMARK")
+    model_type = "LLM PRIOR" if use_llm_prior else "BASELINE"
+    print_header(f"SPEED BENCHMARK ({model_type})")
     
-    model_path = get_model_path()
+    model_path = get_model_path(use_llm_prior)
     print(f"📁 Model: {Path(model_path).name}")
     print(f"🖥️  Device: {DEVICE}")
+    print(f"🧠 Mode: {'PCMCI + LLM Prior' if use_llm_prior else 'PCMCI Only'}")
     
     if DEVICE == "cuda":
         print(f"🎮 GPU: {torch.cuda.get_device_name(0)}")
@@ -534,8 +566,11 @@ def demo_architecture():
 
 def interactive_menu():
     """Show interactive menu for demo selection."""
+    use_llm_prior = False  # Track current mode
+    
     while True:
-        print_header("MULTIMODAL RCA DEMO", "═")
+        mode_str = "LLM PRIOR" if use_llm_prior else "BASELINE"
+        print_header(f"MULTIMODAL RCA DEMO [{mode_str}]", "═")
         print("  Select a demo to run:")
         print()
         print("  [1] 📊 Evaluate Model       - Test accuracy on benchmark")
@@ -544,11 +579,13 @@ def interactive_menu():
         print("  [4] 🏗️  Architecture         - View model structure")
         print("  [5] 🎯 Quick Demo           - Fast evaluation (3 samples)")
         print("  [6] 🚀 Full Demo            - Run all demos")
+        print()
+        print(f"  [L] 🔄 Toggle LLM Prior    - Currently: {mode_str}")
         print("  [0] ❌ Exit")
         print()
         
         try:
-            choice = input("  Enter choice [0-6]: ").strip()
+            choice = input("  Enter choice [0-6, L]: ").strip().lower()
         except (KeyboardInterrupt, EOFError):
             print("\n\nExiting...")
             break
@@ -556,21 +593,24 @@ def interactive_menu():
         if choice == '0':
             print("\nGoodbye! 👋")
             break
+        elif choice == 'l':
+            use_llm_prior = not use_llm_prior
+            print(f"\n  ✅ Switched to {'LLM Prior' if use_llm_prior else 'Baseline'} mode")
         elif choice == '1':
-            demo_evaluate()
+            demo_evaluate(use_llm_prior=use_llm_prior)
         elif choice == '2':
-            demo_inference(num_samples=5, use_llm=True)
+            demo_inference(num_samples=5, use_llm=True, use_llm_prior=use_llm_prior)
         elif choice == '3':
-            demo_speed()
+            demo_speed(use_llm_prior=use_llm_prior)
         elif choice == '4':
             demo_architecture()
         elif choice == '5':
-            demo_inference(num_samples=3, use_llm=False)
+            demo_inference(num_samples=3, use_llm=False, use_llm_prior=use_llm_prior)
         elif choice == '6':
             demo_architecture()
-            demo_evaluate()
-            demo_speed()
-            demo_inference(num_samples=3, use_llm=True)
+            demo_evaluate(use_llm_prior=use_llm_prior)
+            demo_speed(use_llm_prior=use_llm_prior)
+            demo_inference(num_samples=3, use_llm=True, use_llm_prior=use_llm_prior)
         else:
             print("  Invalid choice. Please try again.")
         
@@ -588,12 +628,14 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python scripts/demo.py                    # Interactive menu
-  python scripts/demo.py --mode evaluate    # Evaluate model
-  python scripts/demo.py --mode inference   # Run inference  
-  python scripts/demo.py --mode speed       # Speed benchmark
-  python scripts/demo.py --mode quick       # Quick demo
-  python scripts/demo.py --mode all         # All demos
+  python scripts/demo.py                         # Interactive menu
+  python scripts/demo.py --mode evaluate         # Evaluate baseline model
+  python scripts/demo.py --mode evaluate --llm-prior  # Evaluate LLM prior model
+  python scripts/demo.py --mode inference        # Run inference  
+  python scripts/demo.py --mode speed            # Speed benchmark
+  python scripts/demo.py --mode quick            # Quick demo
+  python scripts/demo.py --mode all              # All demos
+  python scripts/demo.py --mode all --llm-prior  # All demos with LLM prior
         """
     )
     
@@ -618,8 +660,15 @@ Examples:
         help='Disable LLM explanations'
     )
     
+    parser.add_argument(
+        '--llm-prior',
+        action='store_true',
+        help='Use LLM prior model (PCMCI + LLM causal weights) instead of baseline'
+    )
+    
     args = parser.parse_args()
     
+    model_type = "LLM PRIOR" if args.llm_prior else "BASELINE"
     print_header("MULTIMODAL ROOT CAUSE ANALYSIS", "═")
     print("  Authors: Parth Gupta, Pratyush Jain, Vipul Kumar Chauhan")
     print("  Course:  B.Tech Major Project")
@@ -627,26 +676,27 @@ Examples:
     print(f"  Device:  {DEVICE}")
     if DEVICE == "cuda":
         print(f"  GPU:     {torch.cuda.get_device_name(0)}")
+    print(f"  Model:   {model_type}")
     
     try:
         if args.mode == 'interactive':
             interactive_menu()
         elif args.mode == 'evaluate':
-            demo_evaluate()
+            demo_evaluate(use_llm_prior=args.llm_prior)
         elif args.mode == 'inference':
-            demo_inference(num_samples=args.samples, use_llm=not args.no_llm)
+            demo_inference(num_samples=args.samples, use_llm=not args.no_llm, use_llm_prior=args.llm_prior)
         elif args.mode == 'speed':
-            demo_speed()
+            demo_speed(use_llm_prior=args.llm_prior)
         elif args.mode == 'architecture':
             demo_architecture()
         elif args.mode == 'quick':
             demo_architecture()
-            demo_inference(num_samples=3, use_llm=False)
+            demo_inference(num_samples=3, use_llm=False, use_llm_prior=args.llm_prior)
         elif args.mode == 'all':
             demo_architecture()
-            demo_evaluate()
-            demo_speed()
-            demo_inference(num_samples=5, use_llm=not args.no_llm)
+            demo_evaluate(use_llm_prior=args.llm_prior)
+            demo_speed(use_llm_prior=args.llm_prior)
+            demo_inference(num_samples=5, use_llm=not args.no_llm, use_llm_prior=args.llm_prior)
     except FileNotFoundError as e:
         print(f"\n❌ Error: {e}")
         print("   Please ensure you have trained models in outputs/models/")

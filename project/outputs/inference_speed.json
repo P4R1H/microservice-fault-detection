@@ -1,71 +1,67 @@
 {
   "metadata": {
-    "description": "Inference speed benchmark for Multimodal V4 RCA Model",
+    "description": "Inference speed benchmark",
     "device": "cuda",
     "gpu_name": "NVIDIA GeForce RTX 4070 Laptop GPU",
-    "num_warmup": 5,
     "num_runs": 100,
-    "date": "2025-11-26T21:30:20.747960"
+    "date": "2025-11-27T16:26:05.478166"
   },
-  "our_models": {
-    "V4 Multimodal (324K params)": {
-      "mean_ms": 3.7763609999092296,
-      "std_ms": 0.48095049590384975,
-      "min_ms": 3.2540999964112416,
-      "max_ms": 6.883199996082112,
-      "mean_sec": 0.0037763609999092295,
-      "speedup_vs_sota": 236.20623134849677
+  "baseline": {
+    "V4 Small (324K)": {
+      "mean_ms": 3.9062429999466985,
+      "std_ms": 0.8931726734782858,
+      "min_ms": 3.1153999734669924,
+      "max_ms": 8.28660000115633,
+      "mean_sec": 0.0039062429999466987
     },
-    "V4 Multimodal (722K params)": {
-      "mean_ms": 3.996858000609791,
-      "std_ms": 0.603058795615579,
-      "min_ms": 3.397899999981746,
-      "max_ms": 7.616599992616102,
-      "mean_sec": 0.003996858000609791,
-      "speedup_vs_sota": 223.17530416740095
+    "V4 Medium (722K)": {
+      "mean_ms": 4.2965459992410615,
+      "std_ms": 1.121289849129741,
+      "min_ms": 3.2715999986976385,
+      "max_ms": 7.781100022839382,
+      "mean_sec": 0.004296545999241061
     }
   },
-  "baselines": {
-    "Random Walk": {
-      "time_sec": 0.001,
-      "source": "literature/RCAEval paper"
-    },
-    "3-Sigma": {
-      "time_sec": 0.023,
-      "source": "literature/RCAEval paper"
-    },
-    "MicroRCA": {
-      "time_sec": 0.156,
-      "source": "literature/RCAEval paper"
-    },
-    "RUN (SOTA)": {
-      "time_sec": 0.892,
-      "source": "literature/RCAEval paper"
-    },
-    "BARO": {
-      "time_sec": 1.234,
-      "source": "literature/RCAEval paper"
-    },
-    "ARIMA": {
-      "time_sec": 1.876,
-      "source": "literature/RCAEval paper"
-    },
-    "Granger-Lasso": {
-      "time_sec": 2.341,
-      "source": "literature/RCAEval paper"
+  "llm_prior": {
+    "V4 + LLM Prior (324K)": {
+      "mean_ms": 3.758134000818245,
+      "std_ms": 0.5431803418315467,
+      "min_ms": 3.212399984477088,
+      "max_ms": 6.009300006553531,
+      "mean_sec": 0.003758134000818245
     }
   },
-  "batch_inference": {
-    "batch_size": 16,
-    "total_batch_time_ms": 3.8826130000234116,
-    "per_sample_amortized_ms": 0.24266331250146322,
-    "throughput_samples_per_sec": 4120.9360809082755
+  "ensemble": {
+    "baseline_ensemble": {
+      "num_models": 4,
+      "mean_ms": 14.930701998528093,
+      "std_ms": 1.3459030673129007,
+      "min_ms": 13.04859999800101,
+      "max_ms": 18.790699978126213,
+      "mean_sec": 0.014930701998528093,
+      "per_model_ms": 3.7326754996320233
+    },
+    "llm_prior_ensemble": {
+      "num_models": 4,
+      "mean_ms": 17.230468000052497,
+      "std_ms": 3.54870751902047,
+      "min_ms": 13.553299999330193,
+      "max_ms": 28.395900008035824,
+      "mean_sec": 0.0172304680000525,
+      "per_model_ms": 4.307617000013124
+    }
   },
-  "summary": {
-    "sota_method": "RUN (AAAI 2024)",
-    "sota_time_sec": 0.892,
-    "our_best_time_sec": 0.0037763609999092295,
-    "speedup_factor": 236.20623134849677,
-    "batch_throughput": 4120.9360809082755
+  "causal": {
+    "pcmci_only": {
+      "mean_ms": 0.04938200087053701,
+      "std_ms": 0.015761429433864247,
+      "description": "PCMCI causal weight lookup (cached)"
+    },
+    "pcmci_llm_cached": {
+      "mean_ms": 0.07286300096893683,
+      "std_ms": 0.028195850787995653,
+      "description": "PCMCI + LLM prior (both cached)"
+    },
+    "llm_overhead_ms": 0.023481000098399818
   }
 }
