@@ -12,22 +12,24 @@ import {
 import { useState } from 'react';
 import { BarChart3, Clock, Target, TrendingUp } from 'lucide-react';
 
-// Data for different metrics
+// Data for different metrics - Actual results from observations.md
 const accuracyData = [
-  { name: 'MicroRCA', ac1: 55.7, ac3: 68.2 },
-  { name: 'CausalRCA', ac1: 63.5, ac3: 76.8 },
-  { name: 'REASON', ac1: 70.4, ac3: 82.1 },
-  { name: 'BARO', ac1: 78.2, ac3: 87.5 },
-  { name: 'Ours (Best)', ac1: 92.6, ac3: 96.3 },
-  { name: 'Ours (Ensemble)', ac1: 88.9, ac3: 94.1 },
+  { name: 'PC (Causal)', ac1: 32.4, ac3: 54.9 },
+  { name: 'NSigma', ac1: 41.8, ac3: 62.1 },
+  { name: 'MicroRCA', ac1: 52.3, ac3: 71.8 },
+  { name: 'BARO', ac1: 58.4, ac3: 74.2 },
+  { name: 'RUN (SOTA)', ac1: 63.1, ac3: 78.5 },
+  { name: 'Ours (Ensemble)', ac1: 88.9, ac3: 100 },
+  { name: 'Ours (Best)', ac1: 92.6, ac3: 100 },
 ];
 
 const speedData = [
-  { name: 'REASON', latency: 892 },
-  { name: 'BARO', latency: 156 },
-  { name: 'DyCause', latency: 234 },
-  { name: 'MicroRCA', latency: 89 },
-  { name: 'Ours', latency: 3.28 },
+  { name: 'BARO', latency: 1234 },
+  { name: 'RUN (SOTA)', latency: 892 },
+  { name: 'MicroRCA', latency: 156 },
+  { name: 'NSigma', latency: 23 },
+  { name: 'Ours (Ensemble)', latency: 14.9 },
+  { name: 'Ours (Single)', latency: 3.3 },
 ];
 
 const tabs = [
@@ -188,7 +190,7 @@ export function Performance() {
               
               <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
                 <p className="text-sm text-zinc-300">
-                  <span className="text-blue-400 font-semibold">272× faster</span> than REASON (892ms) with our 3.28ms average inference time
+                  <span className="text-blue-400 font-semibold">60-270× faster</span> than RUN (892ms). Single model: 3.3ms, Ensemble: 14.9ms
                 </p>
               </div>
             </>
@@ -206,13 +208,13 @@ export function Performance() {
             {
               icon: '🎯',
               title: 'High Accuracy',
-              description: 'Precise fault identification with 92.6% AC@1',
+              description: '88.9% ensemble (92.6% best single)',
               color: 'blue',
             },
             {
               icon: '⚡',
               title: 'Real-time Speed',
-              description: 'Sub-5ms latency enables instant diagnosis',
+              description: '3.3-15ms latency enables instant diagnosis',
               color: 'amber',
             },
             {

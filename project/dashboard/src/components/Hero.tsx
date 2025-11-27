@@ -57,8 +57,8 @@ export function Hero() {
           className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed"
         >
           Multimodal deep learning that fuses metrics, logs, and traces to identify root causes.
-          Achieving <span className="text-white font-medium">92.6% accuracy</span> with{' '}
-          <span className="text-blue-400 font-medium">272× faster</span> inference than SOTA.
+          Achieving <span className="text-white font-medium">88.9% ensemble</span> accuracy (up to 92.6%) with{' '}
+          <span className="text-blue-400 font-medium">60-270× faster</span> inference than SOTA.
         </motion.p>
 
         {/* CTA Buttons */}
@@ -94,15 +94,15 @@ export function Hero() {
         >
           <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900/50 border border-zinc-800 rounded-full">
             <Zap className="w-4 h-4 text-amber-400" />
-            <span className="text-sm text-zinc-300">3.28ms Latency</span>
+            <span className="text-sm text-zinc-300">3.3ms Latency</span>
           </div>
           <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900/50 border border-zinc-800 rounded-full">
             <Shield className="w-4 h-4 text-blue-400" />
-            <span className="text-sm text-zinc-300">92.6% AC@1</span>
+            <span className="text-sm text-zinc-300">88.9% Ensemble</span>
           </div>
           <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900/50 border border-zinc-800 rounded-full">
             <Clock className="w-4 h-4 text-blue-400" />
-            <span className="text-sm text-zinc-300">Real-time Analysis</span>
+            <span className="text-sm text-zinc-300">100% AC@3</span>
           </div>
         </motion.div>
       </div>

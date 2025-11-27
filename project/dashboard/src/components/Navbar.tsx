@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { Activity, Github, Sun } from 'lucide-react';
+import { Activity, Github } from 'lucide-react';
 
 const navItems = [
   { id: 'home', label: 'Home' },
@@ -86,11 +86,6 @@ export function Navbar() {
 
         {/* Right section */}
         <div className="flex items-center gap-3">
-          {/* Theme toggle */}
-          <button className="w-10 h-10 rounded-full border border-zinc-800 bg-zinc-900/50 flex items-center justify-center text-zinc-400 hover:text-white hover:border-zinc-700 transition-colors">
-            <Sun className="w-4 h-4" />
-          </button>
-
           {/* GitHub link */}
           <a
             href="https://github.com/P4R1H/microservice-fault-detection"

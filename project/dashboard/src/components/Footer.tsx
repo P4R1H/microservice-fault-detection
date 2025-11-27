@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Github, Linkedin, Twitter } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 const navLinks = [
   { label: 'Home', href: '#home' },
@@ -69,38 +69,29 @@ export function Footer() {
             </div>
             
             {/* Team */}
-            <div className="mt-12">
-              <h4 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-4">Team</h4>
-              <div className="space-y-1 text-zinc-400">
-                <p>Parth Gupta</p>
-                <p>Pratyush Jain</p>
-                <p>Vipul Kumar Chauhan</p>
+            <div className="mt-8">
+              <h4 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-3">Team</h4>
+              <div className="space-y-1 text-zinc-400 text-sm">
+                <p>Parth Gupta (2210110452)</p>
+                <p>Pratyush Jain (2210110970)</p>
+                <p>Vipul Kumar Chauhan (2210110904)</p>
               </div>
             </div>
             
-            {/* Social Links */}
-            <div className="flex items-center gap-4 mt-12">
-              <a
-                href="https://github.com/P4R1H/microservice-fault-detection"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all"
-              >
-                <Github className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all"
-              >
-                <Linkedin className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all"
-              >
-                <Twitter className="w-5 h-5" />
-              </a>
+            {/* Supervisors */}
+            <div className="mt-6">
+              <h4 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-3">Supervisors</h4>
+              <div className="space-y-1 text-zinc-400 text-sm">
+                <p>Prof. Rajib Mall</p>
+                <p>Dr. Suchi Kumari</p>
+              </div>
             </div>
+            
+            {/* Institution */}
+            <p className="mt-6 text-xs text-zinc-600">
+              Dept. of Computer Science & Engineering<br />
+              Shiv Nadar University
+            </p>
           </div>
         </div>
       </div>

@@ -21,22 +21,18 @@ import {
 
 // Performance comparison data
 const comparisonData = [
-  { name: 'CausalRCA', value: 63.5, color: '#374151' },
-  { name: 'MicroRCA', value: 55.7, color: '#374151' },
-  { name: 'RCD', value: 51.2, color: '#374151' },
-  { name: 'DyCause', value: 48.3, color: '#374151' },
-  { name: 'REASON', value: 70.4, color: '#374151' },
-  { name: 'BARO', value: 78.2, color: '#374151' },
-  { name: 'Ours', value: 92.6, color: '#3b82f6' },
+  { name: 'PC (Causal)', value: 32.4, color: '#374151' },
+  { name: 'Random Walk', value: 35.6, color: '#374151' },
+  { name: 'NSigma', value: 41.8, color: '#374151' },
+  { name: 'MicroRCA', value: 52.3, color: '#374151' },
+  { name: 'BARO', value: 58.4, color: '#374151' },
+  { name: 'RUN (SOTA)', value: 63.1, color: '#374151' },
+  { name: 'Ours (Ensemble)', value: 88.9, color: '#3b82f6' },
+  { name: 'Ours (Best)', value: 92.6, color: '#60a5fa' },
 ];
 
-// Speed comparison data
-const speedData = [
-  { name: 'REASON', value: 892, color: '#374151' },
-  { name: 'BARO', value: 156, color: '#374151' },
-  { name: 'DyCause', value: 234, color: '#374151' },
-  { name: 'Ours', value: 3.28, color: '#3b82f6' },
-];
+// Speed comparison (for reference - used in Performance component)
+// SOTA (RUN): 892ms, Our single: 3.3ms (270x), Our ensemble: 14.9ms (60x)
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -90,8 +86,8 @@ export function BentoStats() {
               <TrendingUp className="w-5 h-5 text-orange-400" />
               <span className="text-orange-400 text-sm font-semibold uppercase tracking-wide">Model Comparison</span>
             </div>
-            <h3 className="text-4xl font-bold text-white mb-1">92.6%</h3>
-            <p className="text-zinc-400 text-sm mb-6">Best AC@1 accuracy on RCAEval benchmark</p>
+            <h3 className="text-4xl font-bold text-white mb-1">88.9%</h3>
+            <p className="text-zinc-400 text-sm mb-6">Ensemble AC@1 on RCAEval benchmark</p>
             
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -132,8 +128,8 @@ export function BentoStats() {
               <Shield className="w-6 h-6 text-blue-400" />
             </div>
             <div>
-              <h3 className="text-4xl font-bold text-white mb-1">92.6%</h3>
-              <p className="text-zinc-400 text-sm">AC@1 Best Model</p>
+              <h3 className="text-4xl font-bold text-white mb-1">88.9%</h3>
+              <p className="text-zinc-400 text-sm">AC@1 Ensemble (92.6% best)</p>
             </div>
           </motion.div>
 
@@ -160,7 +156,7 @@ export function BentoStats() {
               <Timer className="w-6 h-6 text-blue-400" />
             </div>
             <div>
-              <h3 className="text-4xl font-bold text-white mb-1">272×</h3>
+              <h3 className="text-4xl font-bold text-white mb-1">60-270×</h3>
               <p className="text-zinc-400 text-sm">Faster than SOTA</p>
             </div>
           </motion.div>
@@ -191,7 +187,7 @@ export function BentoStats() {
                 </div>
                 <div>
                   <h3 className="text-3xl font-bold text-white">181</h3>
-                  <p className="text-zinc-400 text-sm">Multimodal Test Cases</p>
+                  <p className="text-zinc-400 text-sm">Total Failure Cases (27 test)</p>
                 </div>
               </div>
               
@@ -201,11 +197,11 @@ export function BentoStats() {
                   <p className="text-xs text-zinc-500">Systems</p>
                 </div>
                 <div className="text-center p-3 bg-zinc-900/50 rounded-xl">
-                  <p className="text-2xl font-bold text-white">10</p>
+                  <p className="text-2xl font-bold text-white">11-41</p>
                   <p className="text-xs text-zinc-500">Services</p>
                 </div>
                 <div className="text-center p-3 bg-zinc-900/50 rounded-xl">
-                  <p className="text-2xl font-bold text-white">5</p>
+                  <p className="text-2xl font-bold text-white">6</p>
                   <p className="text-xs text-zinc-500">Fault Types</p>
                 </div>
               </div>
