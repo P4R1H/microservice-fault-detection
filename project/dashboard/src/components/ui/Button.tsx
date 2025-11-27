@@ -29,15 +29,14 @@ export function Button({
 
   const variants = {
     primary: `
-      bg-gradient-to-r from-indigo-500 to-violet-500
-      hover:from-indigo-400 hover:to-violet-400
-      text-white shadow-lg shadow-indigo-500/25
-      hover:shadow-indigo-500/40
+      bg-blue-500 hover:bg-blue-400
+      text-white shadow-lg shadow-blue-500/25
+      hover:shadow-blue-500/40
     `,
     secondary: `
-      bg-zinc-800 hover:bg-zinc-700
-      text-zinc-100 border border-white/10
-      hover:border-white/20
+      bg-zinc-800/80 hover:bg-zinc-700/80
+      text-zinc-100 border border-zinc-700/50
+      hover:border-zinc-600
     `,
     ghost: `
       bg-transparent hover:bg-white/5

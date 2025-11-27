@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, Zap, Shield, Clock } from 'lucide-react';
+import { ArrowRight, Sparkles, Zap, Shield, Award } from 'lucide-react';
 
 export function Hero() {
   const scrollToDemo = () => {
@@ -14,17 +14,17 @@ export function Hero() {
       
       {/* Floating decorative elements */}
       <motion.div
-        className="absolute top-1/4 left-1/4 w-3 h-3 rounded-full bg-blue-400/30 floating"
+        className="absolute top-1/4 left-1/4 w-2 h-2 rounded-full bg-blue-400/40"
         animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0.6, 0.3] }}
         transition={{ duration: 4, repeat: Infinity }}
       />
       <motion.div
-        className="absolute top-1/3 right-1/4 w-2 h-2 rounded-full bg-blue-400/40 floating-delayed"
+        className="absolute top-1/3 right-1/4 w-1.5 h-1.5 rounded-full bg-blue-400/50"
         animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.7, 0.4] }}
         transition={{ duration: 3, repeat: Infinity, delay: 1 }}
       />
       <motion.div
-        className="absolute bottom-1/3 left-1/3 w-4 h-4 rounded-full bg-blue-500/20 floating"
+        className="absolute bottom-1/3 left-1/3 w-3 h-3 rounded-full bg-blue-500/20"
         animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.5, 0.2] }}
         transition={{ duration: 5, repeat: Infinity, delay: 2 }}
       />
@@ -54,7 +54,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed"
+          className="text-base md:text-lg text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed"
         >
           Multimodal deep learning that fuses metrics, logs, and traces to identify root causes.
           Achieving <span className="text-white font-medium">88.9% ensemble</span> accuracy (up to 92.6%) with{' '}
@@ -70,17 +70,17 @@ export function Hero() {
         >
           <button
             onClick={scrollToDemo}
-            className="group flex items-center gap-2 px-8 py-4 bg-blue-500 hover:bg-blue-400 text-white font-semibold rounded-full transition-all duration-300 hover:shadow-[0_0_40px_rgba(59,130,246,0.4)] hover:-translate-y-1"
+            className="group flex items-center gap-2 px-7 py-3.5 bg-blue-500 hover:bg-blue-400 text-white font-semibold rounded-full transition-all duration-300 hover:shadow-[0_0_40px_rgba(59,130,246,0.4)] hover:-translate-y-0.5"
           >
             Start Diagnosis
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
           
           <button
             onClick={() => document.getElementById('architecture')?.scrollIntoView({ behavior: 'smooth' })}
-            className="flex items-center gap-2 px-8 py-4 border border-zinc-700 text-white font-medium rounded-full hover:border-zinc-500 hover:bg-white/5 transition-all duration-300"
+            className="flex items-center gap-2 px-7 py-3.5 border border-zinc-700 text-white font-medium rounded-full hover:border-zinc-500 hover:bg-white/5 transition-all duration-300"
           >
-            <Sparkles className="w-5 h-5 text-blue-400" />
+            <Sparkles className="w-4 h-4 text-blue-400" />
             View Architecture
           </button>
         </motion.div>
@@ -92,16 +92,16 @@ export function Hero() {
           transition={{ duration: 0.5, delay: 0.5 }}
           className="flex flex-wrap items-center justify-center gap-3"
         >
-          <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900/50 border border-zinc-800 rounded-full">
+          <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900/60 border border-zinc-800/80 rounded-full">
             <Zap className="w-4 h-4 text-amber-400" />
             <span className="text-sm text-zinc-300">3.3ms Latency</span>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900/50 border border-zinc-800 rounded-full">
+          <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900/60 border border-zinc-800/80 rounded-full">
             <Shield className="w-4 h-4 text-blue-400" />
             <span className="text-sm text-zinc-300">88.9% Ensemble</span>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900/50 border border-zinc-800 rounded-full">
-            <Clock className="w-4 h-4 text-blue-400" />
+          <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900/60 border border-zinc-800/80 rounded-full">
+            <Award className="w-4 h-4 text-emerald-400" />
             <span className="text-sm text-zinc-300">100% AC@3</span>
           </div>
         </motion.div>

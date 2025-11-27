@@ -132,8 +132,8 @@ export function Performance() {
                     />
                     <Tooltip
                       contentStyle={{
-                        background: '#111916',
-                        border: '1px solid rgba(16, 185, 129, 0.2)',
+                        background: '#0f1219',
+                        border: '1px solid rgba(59, 130, 246, 0.2)',
                         borderRadius: '12px',
                       }}
                       formatter={(value: number) => [`${value}%`]}
@@ -170,8 +170,8 @@ export function Performance() {
                     />
                     <Tooltip
                       contentStyle={{
-                        background: '#111916',
-                        border: '1px solid rgba(16, 185, 129, 0.2)',
+                        background: '#0f1219',
+                        border: '1px solid rgba(59, 130, 246, 0.2)',
                         borderRadius: '12px',
                       }}
                       formatter={(value: number) => [`${value}ms`, 'Latency']}
@@ -180,7 +180,7 @@ export function Performance() {
                       {speedData.map((entry, index) => (
                         <Cell 
                           key={`cell-${index}`} 
-                          fill={entry.name === 'Ours' ? '#3b82f6' : '#374151'} 
+                          fill={entry.name.startsWith('Ours') ? '#3b82f6' : '#374151'} 
                         />
                       ))}
                     </Bar>
@@ -204,37 +204,29 @@ export function Performance() {
           viewport={{ once: true }}
           className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8"
         >
-          {[
-            {
-              Icon: Target,
-              title: 'High Accuracy',
-              description: '88.9% ensemble (92.6% best single)',
-              color: 'blue',
-            },
-            {
-              Icon: Clock,
-              title: 'Real-time Speed',
-              description: '3.3-15ms latency enables instant diagnosis',
-              color: 'amber',
-            },
-            {
-              Icon: TrendingUp,
-              title: 'Explainable',
-              description: 'LLM-powered insights for actionable remediation',
-              color: 'purple',
-            },
-          ].map((feature) => (
-            <div
-              key={feature.title}
-              className="bento-card p-6 text-center group hover:border-blue-500/30 transition-colors"
-            >
-              <div className={`w-14 h-14 rounded-2xl bg-${feature.color}-500/20 flex items-center justify-center mx-auto mb-4`}>
-                <feature.Icon className={`w-7 h-7 text-${feature.color}-400`} />
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
-              <p className="text-sm text-zinc-400">{feature.description}</p>
+          <div className="bento-card p-6 text-center group hover:border-blue-500/30 transition-colors">
+            <div className="w-14 h-14 rounded-2xl bg-blue-500/20 flex items-center justify-center mx-auto mb-4">
+              <Target className="w-7 h-7 text-blue-400" />
             </div>
-          ))}
+            <h3 className="text-lg font-semibold text-white mb-2">High Accuracy</h3>
+            <p className="text-sm text-zinc-400">88.9% ensemble (92.6% best single)</p>
+          </div>
+          
+          <div className="bento-card p-6 text-center group hover:border-blue-500/30 transition-colors">
+            <div className="w-14 h-14 rounded-2xl bg-amber-500/20 flex items-center justify-center mx-auto mb-4">
+              <Clock className="w-7 h-7 text-amber-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-white mb-2">Real-time Speed</h3>
+            <p className="text-sm text-zinc-400">3.3-15ms latency enables instant diagnosis</p>
+          </div>
+          
+          <div className="bento-card p-6 text-center group hover:border-blue-500/30 transition-colors">
+            <div className="w-14 h-14 rounded-2xl bg-purple-500/20 flex items-center justify-center mx-auto mb-4">
+              <TrendingUp className="w-7 h-7 text-purple-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-white mb-2">Explainable</h3>
+            <p className="text-sm text-zinc-400">LLM-powered insights for actionable remediation</p>
+          </div>
         </motion.div>
       </div>
     </section>

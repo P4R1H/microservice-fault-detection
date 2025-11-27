@@ -3,7 +3,7 @@ import { useState } from 'react';
 import {
   Activity, FileText, Network, Layers, GitMerge, Brain, Cpu, Zap,
   Sparkles, Target, Hash, Timer, Gauge, Box, Combine, GitBranch,
-  MessageSquare, Workflow, ChevronDown, Database
+  MessageSquare, Workflow, Database
 } from 'lucide-react';
 
 // --- Types & Data ---
@@ -13,87 +13,102 @@ interface StageInfo {
   title: string;
   subtitle: string;
   icon: React.ElementType;
-  color: string;
+  colorClass: {
+    bg: string;
+    bgLight: string;
+    text: string;
+    border: string;
+  };
   stats: Array<{
     icon: React.ElementType;
     value: string;
     unit?: string;
     label: string;
-    color: string;
+    textColor: string;
   }>;
 }
+
+// Define color classes explicitly for Tailwind JIT
+const colorClasses = {
+  blue: { bg: 'bg-blue-500', bgLight: 'bg-blue-500/20', text: 'text-blue-400', border: 'border-blue-500' },
+  amber: { bg: 'bg-amber-500', bgLight: 'bg-amber-500/20', text: 'text-amber-400', border: 'border-amber-500' },
+  pink: { bg: 'bg-pink-500', bgLight: 'bg-pink-500/20', text: 'text-pink-400', border: 'border-pink-500' },
+  cyan: { bg: 'bg-cyan-500', bgLight: 'bg-cyan-500/20', text: 'text-cyan-400', border: 'border-cyan-500' },
+  purple: { bg: 'bg-purple-500', bgLight: 'bg-purple-500/20', text: 'text-purple-400', border: 'border-purple-500' },
+  emerald: { bg: 'bg-emerald-500', bgLight: 'bg-emerald-500/20', text: 'text-emerald-400', border: 'border-emerald-500' },
+};
 
 const stageDetails: Record<StageId, StageInfo> = {
   input: {
     title: 'Multimodal Input',
     subtitle: 'Raw Data Ingestion',
     icon: Database,
-    color: 'blue',
+    colorClass: colorClasses.blue,
     stats: [
-      { icon: Activity, value: '64', label: 'Metric Feat', color: 'blue' },
-      { icon: FileText, value: '32', label: 'Log Templates', color: 'emerald' },
-      { icon: Network, value: '32', label: 'Trace Feat', color: 'purple' },
-      { icon: Timer, value: '60', label: 'Time Steps', color: 'amber' },
+      { icon: Activity, value: '64', label: 'Metric Feat', textColor: 'text-blue-400' },
+      { icon: FileText, value: '32', label: 'Log Templates', textColor: 'text-emerald-400' },
+      { icon: Network, value: '32', label: 'Trace Feat', textColor: 'text-purple-400' },
+      { icon: Timer, value: '60', label: 'Time Steps', textColor: 'text-amber-400' },
     ],
   },
   tcn: {
     title: 'TCN Encoders',
     subtitle: 'Temporal Convolution',
     icon: Layers,
-    color: 'amber',
+    colorClass: colorClasses.amber,
     stats: [
-      { icon: Layers, value: '2', label: 'Blocks', color: 'amber' },
-      { icon: Hash, value: '[1,2]', label: 'Dilation', color: 'blue' },
-      { icon: Box, value: '3', label: 'Kernel', color: 'purple' },
-      { icon: Gauge, value: '64', unit: 'd', label: 'Embed Dim', color: 'emerald' },
+      { icon: Layers, value: '2', label: 'Blocks', textColor: 'text-amber-400' },
+      { icon: Hash, value: '[1,2]', label: 'Dilation', textColor: 'text-blue-400' },
+      { icon: Box, value: '3', label: 'Kernel', textColor: 'text-purple-400' },
+      { icon: Gauge, value: '64', unit: 'd', label: 'Embed Dim', textColor: 'text-emerald-400' },
     ],
   },
   fusion: {
     title: 'Gated Fusion',
     subtitle: 'Modality Merging',
     icon: GitMerge,
-    color: 'pink',
+    colorClass: colorClasses.pink,
     stats: [
-      { icon: Combine, value: '3', label: 'Modalities', color: 'pink' },
-      { icon: GitMerge, value: 'σ(W)', label: 'Gate Func', color: 'blue' },
-      { icon: Gauge, value: '128', unit: 'd', label: 'Fused Dim', color: 'purple' },
-      { icon: Workflow, value: 'Auto', label: 'Adaptive', color: 'amber' },
+      { icon: Combine, value: '3', label: 'Modalities', textColor: 'text-pink-400' },
+      { icon: GitMerge, value: 'σ(W)', label: 'Gate Func', textColor: 'text-blue-400' },
+      { icon: Gauge, value: '128', unit: 'd', label: 'Fused Dim', textColor: 'text-purple-400' },
+      { icon: Workflow, value: 'Auto', label: 'Adaptive', textColor: 'text-amber-400' },
     ],
   },
   attention: {
     title: 'Cross-Service Attention',
     subtitle: 'Causal Discovery',
     icon: Brain,
-    color: 'cyan',
+    colorClass: colorClasses.cyan,
     stats: [
-      { icon: Brain, value: '4', label: 'Heads', color: 'cyan' },
-      { icon: Layers, value: '2', label: 'Tx Layers', color: 'blue' },
-      { icon: GitBranch, value: '0.3', label: 'Causal λ', color: 'purple' },
-      { icon: Network, value: 'DAG', label: 'Graph', color: 'emerald' },
+      { icon: Brain, value: '4', label: 'Heads', textColor: 'text-cyan-400' },
+      { icon: Layers, value: '2', label: 'Tx Layers', textColor: 'text-blue-400' },
+      { icon: GitBranch, value: '0.3', label: 'Causal λ', textColor: 'text-purple-400' },
+      { icon: Network, value: 'DAG', label: 'Graph', textColor: 'text-emerald-400' },
     ],
   },
   llm: {
     title: 'LLM Causal Prior',
     subtitle: 'Gemini Reasoning',
     icon: Sparkles,
-    color: 'purple',
+    colorClass: colorClasses.purple,
     stats: [
-      { icon: Sparkles, value: 'Gemini', label: 'Model', color: 'purple' },
-      { icon: MessageSquare, value: 'CoT', label: 'Reasoning', color: 'blue' },
-      { icon: Brain, value: 'Hybrid', label: 'Arch', color: 'amber' },
-      { icon: Target, value: '+3.2', unit: '%', label: 'Lift', color: 'pink' },
+      { icon: Sparkles, value: 'Gemini', label: 'Model', textColor: 'text-purple-400' },
+      { icon: MessageSquare, value: 'CoT', label: 'Reasoning', textColor: 'text-blue-400' },
+      { icon: Brain, value: 'Hybrid', label: 'Arch', textColor: 'text-amber-400' },
+      { icon: Target, value: '+3.2', unit: '%', label: 'Lift', textColor: 'text-pink-400' },
     ],
   },
   output: {
     title: 'Root Cause Prediction',
     subtitle: 'Final Inference',
     icon: Target,
-    color: 'emerald',
+    colorClass: colorClasses.emerald,
     stats: [
-      { icon: Target, value: '88.9', unit: '%', label: 'Accuracy', color: 'emerald' },
-      { icon: Zap, value: '3.3', unit: 'ms', label: 'Latency', color: 'amber' },
-      { icon: Cpu, value: '324', unit: 'K', label: 'Params', color: 'blue' },
-      { icon: Gauge, value: '0.94', label: 'MRR', color: 'purple' },
+      { icon: Target, value: '88.9', unit: '%', label: 'Accuracy', textColor: 'text-emerald-400' },
+      { icon: Zap, value: '3.3', unit: 'ms', label: 'Latency', textColor: 'text-amber-400' },
+      { icon: Cpu, value: '324', unit: 'K', label: 'Params', textColor: 'text-blue-400' },
+      { icon: Gauge, value: '0.94', label: 'MRR', textColor: 'text-purple-400' },
     ],
   },
 };
@@ -153,12 +168,12 @@ export function Architecture() {
                 >
                   {/* Sidebar Indicator */}
                   <div className={`absolute left-0 top-0 bottom-0 w-1 rounded-l-xl transition-all duration-200 ${
-                    isActive ? `bg-${info.color}-500` : `bg-${info.color}-500/20`
+                    isActive ? info.colorClass.bg : `${info.colorClass.bgLight}`
                   }`} />
 
                   <div className="p-4 flex items-center gap-3">
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center bg-${info.color}-500/20`}>
-                      <StageIcon className={`w-4 h-4 text-${info.color}-400`} />
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${info.colorClass.bgLight}`}>
+                      <StageIcon className={`w-4 h-4 ${info.colorClass.text}`} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className={`font-medium text-sm transition-colors ${isActive ? 'text-white' : 'text-zinc-400'}`}>
@@ -166,9 +181,9 @@ export function Architecture() {
                       </h3>
                       <p className="text-xs text-zinc-600 truncate">{info.subtitle}</p>
                     </div>
-                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${
-                      isActive ? 'text-zinc-400 -rotate-90' : 'text-zinc-600 -rotate-90'
-                    }`} />
+                    <svg className={`w-4 h-4 transition-colors ${isActive ? 'text-zinc-400' : 'text-zinc-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </div>
                 </motion.div>
               );
@@ -188,8 +203,8 @@ export function Architecture() {
               >
                 {/* Header */}
                 <div className="flex items-center gap-4 mb-6">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center bg-${activeInfo.color}-500/20`}>
-                    <activeInfo.icon className={`w-6 h-6 text-${activeInfo.color}-400`} />
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${activeInfo.colorClass.bgLight}`}>
+                    <activeInfo.icon className={`w-6 h-6 ${activeInfo.colorClass.text}`} />
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-white">{activeInfo.title}</h3>
@@ -214,7 +229,7 @@ export function Architecture() {
                       className="bg-zinc-950/50 border border-zinc-800/50 p-4 rounded-xl hover:border-zinc-700/50 transition-colors"
                     >
                       <div className="flex items-center gap-2 mb-2">
-                        <stat.icon className={`w-4 h-4 text-${stat.color}-400`} />
+                        <stat.icon className={`w-4 h-4 ${stat.textColor}`} />
                         <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">{stat.label}</span>
                       </div>
                       <div className="text-2xl font-bold text-white">
