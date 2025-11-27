@@ -42,6 +42,7 @@ from src.data.multimodal_data import (
 )
 from src.models.rca_v4_multimodal import MultimodalRCAModel, MultimodalLoss, create_multimodal_model
 from src.causal.pcmci import CausalWeightComputer
+from src.causal.llm_prior import CausalWeightManager, get_system_type
 
 
 def compute_metrics(ranking: torch.Tensor, targets: torch.Tensor) -> dict:
@@ -69,7 +70,7 @@ def compute_metrics(ranking: torch.Tensor, targets: torch.Tensor) -> dict:
 
 
 def train_epoch(model, loader, criterion, optimizer, device, causal_computer, 
-                clip_grad=1.0, accumulate_steps=1):
+                clip_grad=1.0, accumulate_steps=1, services=None, use_llm_prior=False):
     """Train for one epoch."""
     model.train()
     total_loss = 0
@@ -85,12 +86,21 @@ def train_epoch(model, loader, criterion, optimizer, device, causal_computer,
         traces = batch['traces'].to(device) if batch['traces'] is not None else None
         targets = batch['target'].to(device)
         
-        # Get causal weights
-        causal_weights = causal_computer.get_batch_weights(
-            batch['case_id'], 
-            metrics.shape[1],  # n_services
-            device
-        )
+        # Get causal weights (with optional LLM prior)
+        if use_llm_prior and services is not None:
+            system_type = get_system_type(batch['system'][0]) if 'system' in batch else 'generic microservice'
+            causal_weights = causal_computer.get_batch_weights(
+                batch['case_id'],
+                services,
+                system_type,
+                device
+            )
+        else:
+            causal_weights = causal_computer.get_batch_weights(
+                batch['case_id'], 
+                metrics.shape[1],  # n_services
+                device
+            )
         
         # Forward
         outputs = model(metrics, logs, traces, causal_weights)
@@ -130,7 +140,8 @@ def train_epoch(model, loader, criterion, optimizer, device, causal_computer,
 
 
 @torch.no_grad()
-def evaluate(model, loader, criterion, device, causal_computer):
+def evaluate(model, loader, criterion, device, causal_computer, 
+             services=None, use_llm_prior=False):
     """Evaluate model on a dataset."""
     model.eval()
     total_loss = 0
@@ -143,11 +154,21 @@ def evaluate(model, loader, criterion, device, causal_computer):
         traces = batch['traces'].to(device) if batch['traces'] is not None else None
         targets = batch['target'].to(device)
         
-        causal_weights = causal_computer.get_batch_weights(
-            batch['case_id'], 
-            metrics.shape[1],
-            device
-        )
+        # Get causal weights (with optional LLM prior)
+        if use_llm_prior and services is not None:
+            system_type = get_system_type(batch['system'][0]) if 'system' in batch else 'generic microservice'
+            causal_weights = causal_computer.get_batch_weights(
+                batch['case_id'],
+                services,
+                system_type,
+                device
+            )
+        else:
+            causal_weights = causal_computer.get_batch_weights(
+                batch['case_id'], 
+                metrics.shape[1],
+                device
+            )
         
         outputs = model(metrics, logs, traces, causal_weights)
         losses = criterion(outputs['logits'], targets)
@@ -226,12 +247,23 @@ def train(args):
         if name not in ['total', 'trainable']:
             print(f"  {name}: {count:,}")
     
-    # Create causal weight computer
+    # Create causal weight computer (with optional LLM prior)
     print("\nInitializing causal weight computer...")
-    causal_computer = CausalWeightComputer(
-        cache_path=args.causal_cache,
-        services=services
-    )
+    if args.use_llm_prior:
+        print(f"  Using LLM Causal Prior (lambda_pcmci={args.lambda_pcmci}, lambda_prior={args.lambda_prior})")
+        causal_computer = CausalWeightManager(
+            pcmci_cache_path=args.causal_cache,
+            llm_cache_path=args.llm_causal_cache,
+            lambda_pcmci=args.lambda_pcmci,
+            lambda_prior=args.lambda_prior,
+            use_llm_prior=True
+        )
+    else:
+        print("  Using PCMCI only (no LLM prior)")
+        causal_computer = CausalWeightComputer(
+            cache_path=args.causal_cache,
+            services=services
+        )
     
     # Loss and optimizer
     criterion = MultimodalLoss(
@@ -268,11 +300,13 @@ def train(args):
         # Train
         train_metrics = train_epoch(
             model, train_loader, criterion, optimizer, device,
-            causal_computer, clip_grad=args.clip_grad
+            causal_computer, clip_grad=args.clip_grad,
+            services=services, use_llm_prior=args.use_llm_prior
         )
         
         # Validate
-        val_metrics = evaluate(model, val_loader, criterion, device, causal_computer)
+        val_metrics = evaluate(model, val_loader, criterion, device, causal_computer,
+                              services=services, use_llm_prior=args.use_llm_prior)
         
         # Update scheduler
         scheduler.step()
@@ -317,7 +351,8 @@ def train(args):
     checkpoint = torch.load(args.save_path, weights_only=False)
     model.load_state_dict(checkpoint['model_state_dict'])
     
-    test_metrics = evaluate(model, test_loader, criterion, device, causal_computer)
+    test_metrics = evaluate(model, test_loader, criterion, device, causal_computer,
+                           services=services, use_llm_prior=args.use_llm_prior)
     history['test'].append(test_metrics)
     
     print(f"\nTest Results:")
@@ -390,6 +425,16 @@ def main():
     parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu')
     parser.add_argument('--save-path', type=str, default='outputs/models/multimodal_v4.pt')
     parser.add_argument('--causal-cache', type=str, default='outputs/causal_cache_multimodal.pkl')
+    
+    # LLM Causal Prior
+    parser.add_argument('--use-llm-prior', action='store_true',
+                        help='Use LLM-based causal prior in addition to PCMCI')
+    parser.add_argument('--lambda-pcmci', type=float, default=0.7,
+                        help='Weight for PCMCI statistical causal discovery')
+    parser.add_argument('--lambda-prior', type=float, default=0.3,
+                        help='Weight for LLM causal prior')
+    parser.add_argument('--llm-causal-cache', type=str, default='outputs/llm_causal_cache.pkl',
+                        help='Path to LLM causal prior cache')
     
     args = parser.parse_args()
     
