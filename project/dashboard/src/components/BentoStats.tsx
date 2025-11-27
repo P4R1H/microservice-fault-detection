@@ -83,8 +83,8 @@ export function BentoStats() {
             className="bento-card p-6 lg:col-span-2 lg:row-span-2"
           >
             <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="w-5 h-5 text-orange-400" />
-              <span className="text-orange-400 text-sm font-semibold uppercase tracking-wide">Model Comparison</span>
+              <TrendingUp className="w-5 h-5 text-blue-400" />
+              <span className="text-blue-400 text-sm font-semibold uppercase tracking-wide">Model Comparison</span>
             </div>
             <h3 className="text-4xl font-bold text-white mb-1">88.9%</h3>
             <p className="text-zinc-400 text-sm mb-6">Ensemble AC@1 on RCAEval benchmark</p>
@@ -103,8 +103,8 @@ export function BentoStats() {
                   />
                   <Tooltip
                     contentStyle={{
-                      background: '#111916',
-                      border: '1px solid rgba(16, 185, 129, 0.2)',
+                      background: '#0f1219',
+                      border: '1px solid rgba(59, 130, 246, 0.2)',
                       borderRadius: '12px',
                     }}
                     formatter={(value: number) => [`${value}%`, 'AC@1']}

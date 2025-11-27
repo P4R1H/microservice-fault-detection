@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { Activity, Github } from 'lucide-react';
+import { Radar, Github } from 'lucide-react';
 
 const navItems = [
   { id: 'home', label: 'Home' },
@@ -60,10 +60,10 @@ export function Navbar() {
           whileHover={{ scale: 1.02 }}
         >
           <div className="w-9 h-9 rounded-xl bg-blue-500/20 flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
-            <Activity className="w-5 h-5 text-blue-400" />
+            <Radar className="w-5 h-5 text-blue-400" />
           </div>
-          <span className="text-xl font-bold text-blue-400">
-            Multimodal<span className="text-white">RCA</span>
+          <span className="text-xl font-bold">
+            <span className="text-blue-400">MM</span><span className="text-white">RCA</span>
           </span>
         </motion.a>
 
