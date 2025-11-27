@@ -1,0 +1,92 @@
+{
+  "model_path": "outputs/models/multimodal_v41_tfidf_s42.pt",
+  "timestamp": "2025-11-26T20:31:48.888829",
+  "accuracy": 0.5,
+  "results": [
+    {
+      "sample_id": 0,
+      "prediction": {
+        "root_cause": "ts-train-service",
+        "confidence": 0.9035623669624329,
+        "ranking": [
+          [
+            "ts-train-service",
+            0.9035623669624329
+          ],
+          [
+            "ts-travel-service",
+            0.013801712542772293
+          ],
+          [
+            "ts-order-service",
+            0.012998045422136784
+          ],
+          [
+            "ts-auth-service",
+            0.011970038525760174
+          ],
+          [
+            "ts-route-service",
+            0.010325429029762745
+          ]
+        ],
+        "ground_truth": "ts-train-service",
+        "correct": true
+      },
+      "context_summary": {
+        "services_with_metric_anomalies": [
+          "ts-auth-service",
+          "ts-order-service",
+          "ts-route-service",
+          "ts-train-service",
+          "ts-travel-service"
+        ],
+        "services_with_trace_issues": []
+      },
+      "explanation": "## Root Cause: ts-train-service\nts-train-service likely failed due to an unknown issue, evidenced by its high probability score.\n\n## Evidence\n- ts-train-service has a 90.4% probability of being the root cause.\n\n## Immediate Actions\n1. Investigate ts-train-service logs for errors.\n2. Check ts-train-service resource utilization (CPU, memory).\n3. Restart ts-train-service.\n\n## Prevention\n- Implement robust monitoring and alerting for ts-train-service.\n",
+      "comparison": "\u2705 Prediction matches ground truth: ts-train-service"
+    },
+    {
+      "sample_id": 1,
+      "prediction": {
+        "root_cause": "productcatalogservice",
+        "confidence": 0.7435614466667175,
+        "ranking": [
+          [
+            "productcatalogservice",
+            0.7435614466667175
+          ],
+          [
+            "emailservice",
+            0.03508958965539932
+          ],
+          [
+            "checkoutservice",
+            0.032222211360931396
+          ],
+          [
+            "currencyservice",
+            0.029537154361605644
+          ],
+          [
+            "recommendationservice",
+            0.02929726429283619
+          ]
+        ],
+        "ground_truth": "emailservice",
+        "correct": false
+      },
+      "context_summary": {
+        "services_with_metric_anomalies": [
+          "checkoutservice",
+          "currencyservice",
+          "productcatalogservice",
+          "recommendationservice"
+        ],
+        "services_with_trace_issues": []
+      },
+      "explanation": "## Root Cause: productcatalogservice\nproductcatalogservice experienced increased latency due to a database connection pool exhaustion.\n\n## Evidence\n- productcatalogservice latency increased by 3x.\n- productcatalogservice logs show \"connection pool exhausted\" errors.\n- Database metrics show maximum connections reached.\n\n## Immediate Actions\n1. Increase the maximum database connection pool size for productcatalogservice.\n2. Restart productcatalogservice to apply the new connection pool size.\n3. Monitor productcatalogservice latency and database connections.\n\n## Prevention\n- Implement connection pooling monitoring and alerting.\n- Implement circuit breaker pattern for database connections.\n",
+      "comparison": "\u274c Predicted: productcatalogservice, Actual: emailservice\n\n*   'productcatalogservice' might have shown symptoms due to resource exhaustion or dependency issues triggered by increased traffic.\n*   'emailservice' likely caused the cascade by failing to process requests, leading to retries and overloading downstream services.\n*   Missed signal: Early warning signs of 'emailservice' degradation (increased latency, error rates) before complete failure.\n"
+    }
+  ]
+}

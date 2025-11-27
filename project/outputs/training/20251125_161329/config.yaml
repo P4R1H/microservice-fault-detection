@@ -1,0 +1,70 @@
+model:
+  device: cuda
+  mixed_precision: true
+  model:
+    causal:
+      alpha_level: 0.05
+      independence_test: parcorr
+      method: pcmci
+      pc_alpha: 0.15
+      tau_max: 5
+    fusion:
+      dropout: 0.1
+      fusion_dim: 512
+      num_heads: 8
+      strategy: intermediate
+    logs_encoder:
+      drain:
+        depth: 4
+        max_children: 100
+        similarity_threshold: 0.5
+      embedding_dim: 256
+      embedding_method: tfidf
+      sentence_bert:
+        model_name: all-MiniLM-L6-v2
+    metrics_encoder:
+      chronos:
+        context_length: 512
+        embedding_dim: 256
+        freeze_backbone: true
+        model_name: amazon/chronos-bolt-tiny
+        prediction_length: 64
+      tcn:
+        dilation:
+        - 1
+        - 2
+        - 4
+        - 8
+        - 16
+        - 32
+        - 64
+        dropout: 0.3
+        embedding_dim: 256
+        hidden_channels: 64
+        in_channels: 7
+        kernel_size: 3
+        num_layers: 7
+      type: chronos
+    rca:
+      dropout: 0.1
+      hidden_dim: 256
+    traces_encoder:
+      dropout: 0.3
+      embedding_dim: 128
+      gat:
+        attention_dropout: 0.4
+        num_heads: 4
+      hidden_channels: 64
+      in_channels: 8
+      num_layers: 2
+      type: gcn
+training:
+  batch_size: 4
+  early_stopping_patience: 15
+  epochs: 2
+  label_smoothing: 0.1
+  learning_rate: 0.0001
+  max_grad_norm: 1.0
+  optimizer: adamw
+  scheduler: cosine
+  weight_decay: 0.01

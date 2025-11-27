@@ -1,0 +1,21 @@
+{
+  "test_metrics": {
+    "AC@1": 0.0,
+    "AC@3": 0.25,
+    "AC@5": 0.25,
+    "MRR": 0.1600899100899101
+  },
+  "best_val_acc": 0.0,
+  "args": {
+    "data_dir": "data/RCAEval",
+    "output_dir": "outputs",
+    "epochs": 80,
+    "batch_size": 16,
+    "lr": 0.0003,
+    "patience": 20,
+    "use_pcmci": true,
+    "seed": 42,
+    "causal_weight": 0.3
+  },
+  "timestamp": "2025-11-25T17:10:22.649980"
+}
