@@ -5,24 +5,24 @@
 // Data sourced from: observations.md, Report.md, v4_final_results.json
 // =============================================================================
 
-// Hero Section Metrics
+// Hero Section Metrics - Primary shows ensemble, secondary shows best single
 export const heroMetrics = {
   accuracy: {
     value: 88.9,
     label: "AC@1",
-    description: "Accuracy at Rank 1",
+    description: "Ensemble Accuracy (92.6% best)",
     suffix: "%"
   },
   speedup: {
-    value: 272,
+    value: "60-270",
     label: "Faster",
-    description: "vs State-of-the-Art",
+    description: "vs State-of-the-Art (RUN)",
     suffix: "×"
   },
   latency: {
     value: 3.3,
     label: "Inference",
-    description: "Per-sample latency",
+    description: "Single model (14.9ms ensemble)",
     suffix: "ms"
   }
 };
@@ -79,7 +79,7 @@ export const performanceData = {
   ]
 };
 
-// Speed Comparison Data
+// Speed Comparison Data - Actual from observations.md
 export const speedComparisonData = [
   { name: "Ours (Single)", time: 3.3, speedup: 270, accuracy: 92.6 },
   { name: "Ours (Ensemble)", time: 14.9, speedup: 60, accuracy: 88.9 },
@@ -87,7 +87,7 @@ export const speedComparisonData = [
   { name: "NSigma", time: 23.0, speedup: 39, accuracy: 41.8 },
   { name: "MicroRCA", time: 156.0, speedup: 5.7, accuracy: 52.3 },
   { name: "RUN (SOTA)", time: 892.0, speedup: 1, accuracy: 63.1 },
-  { name: "BARO", time: 1234.0, speedup: 0.7, accuracy: 58.4 },
+  { name: "BARO", time: 1234.0, speedup: 0.72, accuracy: 58.4 },
 ];
 
 // Ablation Study Data (Waterfall chart)
@@ -129,15 +129,15 @@ export const architectureFlow = {
   }
 };
 
-// Dataset Information
+// Dataset Information - Accurate from RCAEval
 export const datasets = [
   {
     id: "online-boutique",
     name: "OnlineBoutique",
     description: "Google's microservice demo application",
     services: 11,
-    faultTypes: ["CPU Load", "Memory Leak", "Network Delay", "Pod Kill"],
-    samples: 64,
+    faultTypes: ["CPU", "Memory", "Disk", "Socket", "Network Delay", "Packet Loss"],
+    samples: 60,
     icon: "ShoppingCart",
     color: "#6366f1"
   },
@@ -146,18 +146,18 @@ export const datasets = [
     name: "SockShop",
     description: "Weaveworks microservice reference",
     services: 14,
-    faultTypes: ["CPU Load", "Memory Leak", "Network Delay"],
-    samples: 58,
+    faultTypes: ["CPU", "Memory", "Disk", "Socket", "Network Delay", "Packet Loss"],
+    samples: 60,
     icon: "Package",
     color: "#8b5cf6"
   },
   {
     id: "train-ticket",
     name: "TrainTicket",
-    description: "Complex ticket booking system",
+    description: "Complex ticket booking system (41+ services)",
     services: 41,
-    faultTypes: ["CPU Load", "Memory Leak", "Network Delay", "Pod Kill"],
-    samples: 59,
+    faultTypes: ["CPU", "Memory", "Disk", "Socket", "Network Delay", "Packet Loss"],
+    samples: 61,
     icon: "Train",
     color: "#a855f7"
   }
@@ -253,11 +253,12 @@ export const navItems = [
   { id: "demo", label: "Live Demo" },
 ];
 
-// SOTA Comparison Table
+// SOTA Comparison Table - Actual from observations.md
 export const sotaComparison = [
-  { method: "Ours (Ensemble)", ac1: "88.9%", speed: "14.9ms", speedup: "60×", params: "324K×4" },
-  { method: "Ours (Best Single)", ac1: "92.6%", speed: "3.3ms", speedup: "270×", params: "324K" },
+  { method: "Ours (Best Single)", ac1: "92.6%", speed: "3.3-6.9ms", speedup: "129-270×", params: "324K" },
+  { method: "Ours (Ensemble)", ac1: "88.9%", speed: "14.6ms", speedup: "61×", params: "324K×4" },
   { method: "RUN (AAAI 2024)", ac1: "63.1%", speed: "892ms", speedup: "1×", params: "~2M" },
-  { method: "BARO", ac1: "58.4%", speed: "1.2s", speedup: "0.7×", params: "~1M" },
+  { method: "BARO (FSE 2024)", ac1: "58.4%", speed: "1.2s", speedup: "0.7×", params: "~1M" },
   { method: "MicroRCA", ac1: "52.3%", speed: "156ms", speedup: "5.7×", params: "~500K" },
+  { method: "NSigma", ac1: "41.8%", speed: "23ms", speedup: "39×", params: "~10K" },
 ];

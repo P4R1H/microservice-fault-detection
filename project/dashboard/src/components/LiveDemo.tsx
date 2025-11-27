@@ -10,7 +10,8 @@ import {
   ChevronDown,
   Sparkles,
   Target,
-  Upload,
+  Server,
+  AlertCircle,
 } from 'lucide-react';
 
 // Types
@@ -46,7 +47,16 @@ const mockCases: CaseInfo[] = [
   { id: 1, case_id: 'OnlineBoutique_memory_leak_02', system: 'OnlineBoutique', fault_type: 'memory_leak', ground_truth: 'frontend' },
   { id: 2, case_id: 'SockShop_network_delay_01', system: 'SockShop', fault_type: 'network_delay', ground_truth: 'carts' },
   { id: 3, case_id: 'TrainTicket_pod_kill_01', system: 'TrainTicket', fault_type: 'pod_kill', ground_truth: 'ts-order-service' },
+  { id: 4, case_id: 'SockShop_cpu_load_02', system: 'SockShop', fault_type: 'cpu_load', ground_truth: 'orders' },
+  { id: 5, case_id: 'TrainTicket_memory_leak_01', system: 'TrainTicket', fault_type: 'memory_leak', ground_truth: 'ts-travel-service' },
 ];
+
+// System colors
+const systemColors: Record<string, string> = {
+  'OnlineBoutique': 'blue',
+  'SockShop': 'purple',
+  'TrainTicket': 'amber',
+};
 
 // Confidence bar component
 function ConfidenceBar({ service, confidence, rank, isCorrect }: PredictionResult & { isCorrect: boolean }) {
@@ -56,18 +66,18 @@ function ConfidenceBar({ service, confidence, rank, isCorrect }: PredictionResul
     <motion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.3, delay: rank * 0.08 }}
+      transition={{ duration: 0.3, delay: rank * 0.05 }}
       className={`flex items-center gap-3 p-3 rounded-xl ${
-        isTop ? 'bg-blue-500/10 border border-blue-500/30' : 'bg-zinc-900/50'
+        isTop ? 'bg-blue-500/10 border border-blue-500/30' : 'bg-zinc-900/30'
       }`}
     >
-      <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold ${
+      <span className={`w-7 h-7 flex items-center justify-center rounded-lg text-xs font-bold ${
         isTop ? 'bg-blue-500 text-white' : 'bg-zinc-800 text-zinc-400'
       }`}>
         {rank}
       </span>
       <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center justify-between mb-1.5">
           <span className={`font-medium truncate ${isTop ? 'text-white' : 'text-zinc-300'}`}>
             {service}
           </span>
@@ -75,17 +85,17 @@ function ConfidenceBar({ service, confidence, rank, isCorrect }: PredictionResul
             {(confidence * 100).toFixed(1)}%
           </span>
         </div>
-        <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+        <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${confidence * 100}%` }}
-            transition={{ duration: 0.5, delay: rank * 0.08 }}
-            className={`h-full rounded-full ${isTop ? 'bg-blue-500' : 'bg-zinc-600'}`}
+            transition={{ duration: 0.5, delay: rank * 0.05 }}
+            className={`h-full rounded-full ${isTop ? 'bg-gradient-to-r from-blue-500 to-blue-400' : 'bg-zinc-600'}`}
           />
         </div>
       </div>
       {isTop && isCorrect && (
-        <CheckCircle className="w-5 h-5 text-blue-400 flex-shrink-0" />
+        <CheckCircle className="w-5 h-5 text-blue-400 shrink-0" />
       )}
     </motion.div>
   );
@@ -240,266 +250,260 @@ The ${selectedCase.fault_type.replace('_', ' ')} fault was detected in the ${sel
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Live <span className="text-gradient">Inference</span>
           </h2>
           <p className="text-lg text-zinc-400 max-w-xl mx-auto">
-            Select a test case and watch our model diagnose the root cause in real-time
+            Select a failure scenario and watch our model identify the root cause
           </p>
         </motion.div>
 
-        {/* Scanner-style demo container */}
+        {/* Bento grid layout for demo */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="relative"
+          className="grid grid-cols-1 lg:grid-cols-3 gap-4"
         >
-          <div className="rounded-2xl bg-zinc-900/50 border border-zinc-800/50 p-8">
-            {/* Top bar with status */}
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <div className={`w-2.5 h-2.5 rounded-full ${backendAvailable ? 'bg-blue-400 animate-pulse' : 'bg-amber-400'}`} />
-                <span className="text-sm text-zinc-400">
-                  {backendAvailable ? 'Connected to inference server' : 'Running in demo mode'}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-zinc-500 text-sm">
-                <Target className="w-4 h-4" />
-                <span>{cases.length} test cases</span>
+          {/* Left Column: Case Selection */}
+          <div className="lg:col-span-1 space-y-4">
+            {/* Status Card */}
+            <div className="bento-card p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={`w-2.5 h-2.5 rounded-full ${backendAvailable ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+                  <span className="text-sm text-zinc-400">
+                    {backendAvailable ? 'Server Connected' : 'Demo Mode'}
+                  </span>
+                </div>
+                <span className="text-xs text-zinc-600">{cases.length} cases</span>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Left: Input panel */}
-              <div className="space-y-6">
-                {/* Case selector */}
-                <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-3">Select Test Case</label>
-                  <div className="relative">
-                    <button
-                      onClick={() => setDropdownOpen(!dropdownOpen)}
-                      className="w-full flex items-center justify-between px-4 py-4 bg-zinc-900/50 border border-zinc-800 rounded-xl text-left hover:border-blue-500/30 transition-colors"
-                    >
-                      {selectedCase ? (
-                        <div>
-                          <span className="text-white font-medium">{selectedCase.system}</span>
-                          <span className="text-zinc-500 mx-2">•</span>
-                          <span className="text-zinc-400">{selectedCase.fault_type.replace('_', ' ')}</span>
-                        </div>
-                      ) : (
-                        <span className="text-zinc-500">Choose a fault scenario...</span>
-                      )}
-                      <ChevronDown className={`w-5 h-5 text-zinc-500 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
-                    </button>
-                    
-                    <AnimatePresence>
-                      {dropdownOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-2xl z-20 max-h-64 overflow-y-auto"
-                        >
-                          {cases.map((c) => (
-                            <button
-                              key={c.id}
-                              onClick={() => {
-                                setSelectedCase(c);
-                                setDropdownOpen(false);
-                                setResult(null);
-                                setExplanation(null);
-                              }}
-                              className="w-full px-4 py-3 text-left hover:bg-blue-500/10 transition-colors border-b border-zinc-800/50 last:border-b-0"
-                            >
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <span className="text-white font-medium">{c.system}</span>
-                                  <span className="text-zinc-600 mx-2">•</span>
-                                  <span className="text-zinc-400 text-sm">{c.fault_type.replace('_', ' ')}</span>
-                                </div>
-                                <span className="text-xs text-zinc-600 font-mono">#{c.id}</span>
-                              </div>
-                            </button>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </div>
-
-                {/* Model Options */}
-                <div className="flex items-center gap-6 p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl">
-                  <label className="flex items-center gap-3 cursor-pointer group">
-                    <div 
-                      onClick={() => setUseEnsemble(!useEnsemble)}
-                      className={`relative w-11 h-6 rounded-full transition-colors ${useEnsemble ? 'bg-blue-500' : 'bg-zinc-700'}`}
-                    >
-                      <div className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${useEnsemble ? 'translate-x-5' : ''}`} />
-                    </div>
-                    <span className="text-sm text-zinc-300 group-hover:text-white transition-colors">Ensemble</span>
-                  </label>
-                  <label className="flex items-center gap-3 cursor-pointer group">
-                    <div 
-                      onClick={() => setUseLLMPrior(!useLLMPrior)}
-                      className={`relative w-11 h-6 rounded-full transition-colors ${useLLMPrior ? 'bg-blue-500' : 'bg-zinc-700'}`}
-                    >
-                      <div className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${useLLMPrior ? 'translate-x-5' : ''}`} />
-                    </div>
-                    <span className="text-sm text-zinc-300 group-hover:text-white transition-colors">LLM Prior</span>
-                  </label>
-                </div>
-
-                {/* Upload-style display */}
-                <div className="p-8 border-2 border-dashed border-zinc-800 rounded-2xl text-center hover:border-blue-500/30 transition-colors">
-                  <Upload className="w-12 h-12 text-blue-500 mx-auto mb-4" />
-                  <h4 className="text-xl font-bold text-white mb-2">Initiate Analysis</h4>
-                  <p className="text-zinc-500 text-sm mb-6">
-                    {selectedCase 
-                      ? `Ready to analyze ${selectedCase.fault_type.replace('_', ' ')} fault`
-                      : 'Select a test case to begin diagnosis'
-                    }
-                  </p>
-                  
-                  <button
-                    onClick={runInference}
-                    disabled={!selectedCase || isLoading}
-                    className="inline-flex items-center gap-2 px-8 py-3 bg-blue-500 hover:bg-blue-400 disabled:bg-zinc-700 disabled:cursor-not-allowed text-white font-semibold rounded-full transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] disabled:shadow-none"
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        Analyzing...
-                      </>
-                    ) : (
-                      <>
-                        <Play className="w-5 h-5" />
-                        Run Inference
-                      </>
-                    )}
-                  </button>
-                </div>
+            {/* Case Selector Card */}
+            <div className="bento-card p-5 relative z-30">
+              <div className="flex items-center gap-2 mb-4">
+                <Server className="w-4 h-4 text-blue-400" />
+                <span className="text-sm font-medium text-zinc-300">Select Test Case</span>
               </div>
+              
+              <div className="relative">
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="w-full flex items-center justify-between px-4 py-3.5 bg-zinc-900/80 border border-zinc-800 rounded-xl text-left hover:border-blue-500/30 transition-colors"
+                >
+                  {selectedCase ? (
+                    <div className="flex items-center gap-3">
+                      <span className={`w-2 h-2 rounded-full bg-${systemColors[selectedCase.system] || 'blue'}-400`} />
+                      <div>
+                        <span className="text-white font-medium text-sm">{selectedCase.system}</span>
+                        <span className="text-zinc-500 mx-2">·</span>
+                        <span className="text-zinc-400 text-sm">{selectedCase.fault_type.replace(/_/g, ' ')}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <span className="text-zinc-500 text-sm">Choose a scenario...</span>
+                  )}
+                  <ChevronDown className={`w-4 h-4 text-zinc-500 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                <AnimatePresence>
+                  {dropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-2xl z-20 max-h-64 overflow-y-auto"
+                    >
+                      {cases.map((c) => (
+                        <button
+                          key={c.id}
+                          onClick={() => {
+                            setSelectedCase(c);
+                            setDropdownOpen(false);
+                            setResult(null);
+                            setExplanation(null);
+                          }}
+                          className="w-full px-4 py-3 text-left hover:bg-blue-500/10 transition-colors border-b border-zinc-800/50 last:border-b-0"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <span className={`w-2 h-2 rounded-full bg-${systemColors[c.system] || 'blue'}-400`} />
+                              <span className="text-white font-medium text-sm">{c.system}</span>
+                              <span className="text-zinc-500">·</span>
+                              <span className="text-zinc-400 text-sm">{c.fault_type.replace(/_/g, ' ')}</span>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
 
-              {/* Right: Results panel */}
-              <div className="space-y-6">
+            {/* Options Card */}
+            <div className="bento-card p-5">
+              <span className="text-sm font-medium text-zinc-300 mb-4 block">Model Options</span>
+              <div className="space-y-3">
+                <label className="flex items-center justify-between cursor-pointer group">
+                  <span className="text-sm text-zinc-400 group-hover:text-white transition-colors">Use Ensemble (4 models)</span>
+                  <div 
+                    onClick={() => setUseEnsemble(!useEnsemble)}
+                    className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${useEnsemble ? 'bg-blue-500' : 'bg-zinc-700'}`}
+                  >
+                    <div className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${useEnsemble ? 'translate-x-5' : ''}`} />
+                  </div>
+                </label>
+                <label className="flex items-center justify-between cursor-pointer group">
+                  <span className="text-sm text-zinc-400 group-hover:text-white transition-colors">LLM Causal Prior</span>
+                  <div 
+                    onClick={() => setUseLLMPrior(!useLLMPrior)}
+                    className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${useLLMPrior ? 'bg-blue-500' : 'bg-zinc-700'}`}
+                  >
+                    <div className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${useLLMPrior ? 'translate-x-5' : ''}`} />
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            {/* Run Button */}
+            <button
+              onClick={runInference}
+              disabled={!selectedCase || isLoading}
+              className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-blue-500 hover:bg-blue-400 disabled:bg-zinc-800 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.3)] disabled:shadow-none"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <Play className="w-5 h-5" />
+                  Run Diagnosis
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Right Column: Results */}
+          <div className="lg:col-span-2 space-y-4">
+            {/* Results Card */}
+            <div className="bento-card bento-card-accent p-6 min-h-[320px]">
+              <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-2">
                   <Target className="w-5 h-5 text-blue-400" />
-                  <h3 className="text-lg font-semibold text-white">Analysis Results</h3>
+                  <h3 className="text-lg font-semibold text-white">Diagnosis Results</h3>
                 </div>
-
-                {result ? (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="space-y-4"
-                  >
-                    {/* Status banner */}
-                    <div className={`flex items-center gap-3 px-4 py-3 rounded-xl ${
-                      result.correct ? 'bg-blue-500/10 border border-blue-500/30' : 'bg-red-500/10 border border-red-500/30'
-                    }`}>
-                      {result.correct ? (
-                        <CheckCircle className="w-5 h-5 text-blue-400" />
-                      ) : (
-                        <XCircle className="w-5 h-5 text-red-400" />
-                      )}
-                      <div>
-                        <p className={`font-medium ${result.correct ? 'text-blue-400' : 'text-red-400'}`}>
-                          {result.correct ? 'Correct Prediction!' : 'Incorrect Prediction'}
-                        </p>
-                        <p className="text-sm text-zinc-400">
-                          Ground Truth: <span className="text-white">{result.ground_truth}</span>
-                        </p>
-                      </div>
+                {result && (
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900/50 rounded-lg">
+                      <Clock className="w-3.5 h-3.5 text-blue-400" />
+                      <span className="text-xs font-mono text-blue-400">{result.latency_ms.toFixed(2)}ms</span>
                     </div>
-
-                    {/* Metrics */}
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2 px-3 py-2 bg-zinc-900/50 rounded-lg">
-                        <Clock className="w-4 h-4 text-blue-400" />
-                        <span className="text-sm text-zinc-300">
-                          <span className="font-mono text-blue-400">{result.latency_ms.toFixed(2)}ms</span>
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 px-3 py-2 bg-zinc-900/50 rounded-lg">
-                        <Zap className="w-4 h-4 text-amber-400" />
-                        <span className="text-sm text-zinc-300">
-                          <span className="font-mono text-amber-400">{Math.round(892 / result.latency_ms)}×</span> faster
-                        </span>
-                      </div>
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900/50 rounded-lg">
+                      <Zap className="w-3.5 h-3.5 text-amber-400" />
+                      <span className="text-xs font-mono text-amber-400">{Math.round(892 / result.latency_ms)}× faster</span>
                     </div>
-
-                    {/* Predictions */}
-                    <div className="space-y-2">
-                      <p className="text-sm text-zinc-400">Top Predictions</p>
-                      {result.predictions.slice(0, 4).map((pred) => (
-                        <ConfidenceBar
-                          key={pred.service}
-                          {...pred}
-                          isCorrect={pred.rank === 1 && pred.service === result.ground_truth}
-                        />
-                      ))}
-                    </div>
-                  </motion.div>
-                ) : (
-                  <div className="h-64 flex flex-col items-center justify-center text-center border border-zinc-800/50 rounded-xl bg-zinc-900/30">
-                    <div className="w-16 h-16 bg-zinc-800/50 rounded-2xl flex items-center justify-center mb-4">
-                      <Target className="w-8 h-8 text-zinc-600" />
-                    </div>
-                    <p className="text-zinc-500 mb-1">No analysis yet</p>
-                    <p className="text-sm text-zinc-600">
-                      Results will appear here
-                    </p>
                   </div>
                 )}
               </div>
+
+              {result ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="space-y-4"
+                >
+                  {/* Status banner */}
+                  <div className={`flex items-center gap-3 px-4 py-3 rounded-xl ${
+                    result.correct ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-red-500/10 border border-red-500/30'
+                  }`}>
+                    {result.correct ? (
+                      <CheckCircle className="w-5 h-5 text-emerald-400" />
+                    ) : (
+                      <XCircle className="w-5 h-5 text-red-400" />
+                    )}
+                    <div>
+                      <p className={`font-medium ${result.correct ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {result.correct ? '✓ Correct Prediction' : '✗ Incorrect Prediction'}
+                      </p>
+                      <p className="text-sm text-zinc-400">
+                        Ground Truth: <span className="text-white font-medium">{result.ground_truth}</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Predictions */}
+                  <div className="space-y-2">
+                    {result.predictions.slice(0, 5).map((pred) => (
+                      <ConfidenceBar
+                        key={pred.service}
+                        {...pred}
+                        isCorrect={pred.rank === 1 && pred.service === result.ground_truth}
+                      />
+                    ))}
+                  </div>
+                </motion.div>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-center py-12">
+                  <div className="w-16 h-16 bg-zinc-800/50 rounded-2xl flex items-center justify-center mb-4">
+                    <AlertCircle className="w-8 h-8 text-zinc-600" />
+                  </div>
+                  <p className="text-zinc-400 mb-1">No analysis yet</p>
+                  <p className="text-sm text-zinc-600">
+                    Select a case and run diagnosis
+                  </p>
+                </div>
+              )}
             </div>
 
-            {/* AI Explanation section - below the main panels */}
+            {/* AI Explanation Card */}
             <AnimatePresence>
               {(explanation || isLoadingExplanation) && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="mt-8 pt-8 border-t border-zinc-800"
+                  className="bento-card p-6"
                 >
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-xl bg-blue-500/20 flex items-center justify-center">
                       <Sparkles className="w-4 h-4 text-blue-400" />
                     </div>
-                    <h3 className="text-lg font-semibold text-white">AI Analysis</h3>
-                    <span className="text-xs text-zinc-500 bg-zinc-800 px-2 py-1 rounded-full">Gemini</span>
+                    <h3 className="text-base font-semibold text-white">AI Analysis</h3>
+                    <span className="text-xs text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded-full">Gemini</span>
                   </div>
 
                   {isLoadingExplanation ? (
-                    <div className="flex items-center gap-3 text-zinc-400">
+                    <div className="flex items-center gap-3 text-zinc-400 py-4">
                       <Loader2 className="w-5 h-5 animate-spin text-blue-400" />
-                      <span>Generating detailed analysis...</span>
+                      <span className="text-sm">Generating analysis...</span>
                     </div>
                   ) : explanation ? (
-                    <div className="prose prose-invert prose-sm max-w-none">
+                    <div className="prose prose-invert prose-sm max-w-none text-sm">
                       {explanation.split('\n').map((line, i) => {
                         if (line.startsWith('## ')) {
                           return (
-                            <h4 key={i} className="text-blue-400 font-semibold mt-4 mb-2 text-sm">
+                            <h4 key={i} className="text-blue-400 font-semibold mt-3 mb-2 text-sm">
                               {line.replace('## ', '')}
                             </h4>
                           );
                         }
                         if (line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
                           return (
-                            <p key={i} className="ml-4 text-zinc-400 my-1 text-sm">
+                            <p key={i} className="ml-4 text-zinc-400 my-0.5 text-sm">
                               • {line.trim().slice(2)}
                             </p>
                           );
                         }
                         if (/^\d+\.\s/.test(line.trim())) {
                           return (
-                            <p key={i} className="ml-4 text-zinc-400 my-1 text-sm">
+                            <p key={i} className="ml-4 text-zinc-400 my-0.5 text-sm">
                               {line.trim()}
                             </p>
                           );
