@@ -1,251 +1,232 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
 import {
-  Activity,
-  FileText,
-  Network,
-  Layers,
-  GitMerge,
-  Brain,
-  Target,
-  ChevronRight,
+  Activity, FileText, Network, Layers, GitMerge, Brain, Cpu, Zap,
+  Sparkles, Target, Hash, Timer, Gauge, Box, Combine, GitBranch,
+  MessageSquare, Workflow, ChevronDown, Database
 } from 'lucide-react';
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 },
+// --- Types & Data ---
+type StageId = 'input' | 'tcn' | 'fusion' | 'attention' | 'llm' | 'output';
+
+interface StageInfo {
+  title: string;
+  subtitle: string;
+  icon: React.ElementType;
+  color: string;
+  stats: Array<{
+    icon: React.ElementType;
+    value: string;
+    unit?: string;
+    label: string;
+    color: string;
+  }>;
+}
+
+const stageDetails: Record<StageId, StageInfo> = {
+  input: {
+    title: 'Multimodal Input',
+    subtitle: 'Raw Data Ingestion',
+    icon: Database,
+    color: 'blue',
+    stats: [
+      { icon: Activity, value: '64', label: 'Metric Feat', color: 'blue' },
+      { icon: FileText, value: '32', label: 'Log Templates', color: 'emerald' },
+      { icon: Network, value: '32', label: 'Trace Feat', color: 'purple' },
+      { icon: Timer, value: '60', label: 'Time Steps', color: 'amber' },
+    ],
+  },
+  tcn: {
+    title: 'TCN Encoders',
+    subtitle: 'Temporal Convolution',
+    icon: Layers,
+    color: 'amber',
+    stats: [
+      { icon: Layers, value: '2', label: 'Blocks', color: 'amber' },
+      { icon: Hash, value: '[1,2]', label: 'Dilation', color: 'blue' },
+      { icon: Box, value: '3', label: 'Kernel', color: 'purple' },
+      { icon: Gauge, value: '64', unit: 'd', label: 'Embed Dim', color: 'emerald' },
+    ],
+  },
+  fusion: {
+    title: 'Gated Fusion',
+    subtitle: 'Modality Merging',
+    icon: GitMerge,
+    color: 'pink',
+    stats: [
+      { icon: Combine, value: '3', label: 'Modalities', color: 'pink' },
+      { icon: GitMerge, value: 'σ(W)', label: 'Gate Func', color: 'blue' },
+      { icon: Gauge, value: '128', unit: 'd', label: 'Fused Dim', color: 'purple' },
+      { icon: Workflow, value: 'Auto', label: 'Adaptive', color: 'amber' },
+    ],
+  },
+  attention: {
+    title: 'Cross-Service Attention',
+    subtitle: 'Causal Discovery',
+    icon: Brain,
+    color: 'cyan',
+    stats: [
+      { icon: Brain, value: '4', label: 'Heads', color: 'cyan' },
+      { icon: Layers, value: '2', label: 'Tx Layers', color: 'blue' },
+      { icon: GitBranch, value: '0.3', label: 'Causal λ', color: 'purple' },
+      { icon: Network, value: 'DAG', label: 'Graph', color: 'emerald' },
+    ],
+  },
+  llm: {
+    title: 'LLM Causal Prior',
+    subtitle: 'Gemini Reasoning',
+    icon: Sparkles,
+    color: 'purple',
+    stats: [
+      { icon: Sparkles, value: 'Gemini', label: 'Model', color: 'purple' },
+      { icon: MessageSquare, value: 'CoT', label: 'Reasoning', color: 'blue' },
+      { icon: Brain, value: 'Hybrid', label: 'Arch', color: 'amber' },
+      { icon: Target, value: '+3.2', unit: '%', label: 'Lift', color: 'pink' },
+    ],
+  },
+  output: {
+    title: 'Root Cause Prediction',
+    subtitle: 'Final Inference',
+    icon: Target,
+    color: 'emerald',
+    stats: [
+      { icon: Target, value: '88.9', unit: '%', label: 'Accuracy', color: 'emerald' },
+      { icon: Zap, value: '3.3', unit: 'ms', label: 'Latency', color: 'amber' },
+      { icon: Cpu, value: '324', unit: 'K', label: 'Params', color: 'blue' },
+      { icon: Gauge, value: '0.94', label: 'MRR', color: 'purple' },
+    ],
   },
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
+const stages: StageId[] = ['input', 'tcn', 'fusion', 'attention', 'llm', 'output'];
 
 export function Architecture() {
+  const [activeId, setActiveId] = useState<StageId>('input');
+
+  const activeInfo = stageDetails[activeId];
+
   return (
     <section id="architecture" className="relative py-32 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.03)_0%,transparent_70%)]" />
       
-      <div className="relative z-10 max-w-7xl mx-auto px-6">
+      <div className="relative z-10 max-w-6xl mx-auto px-6">
         {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            How It <span className="text-gradient">Works</span>
+            Our <span className="text-gradient">Architecture</span>
           </h2>
           <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
-            A lightweight multimodal pipeline that fuses metrics, logs, and traces
+            Multimodal deep learning with causal reasoning and LLM enhancement
           </p>
         </motion.div>
 
-        {/* Bento Grid - matching the style of BentoStats */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
+        {/* Two-column layout */}
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+          className="grid grid-cols-1 lg:grid-cols-5 gap-6"
         >
-          {/* Large card: Pipeline Overview */}
-          <motion.div
-            variants={itemVariants}
-            className="bento-card p-6 lg:col-span-2 lg:row-span-2"
-          >
-            <div className="flex items-center gap-2 mb-6">
-              <Layers className="w-5 h-5 text-blue-400" />
-              <span className="text-blue-400 text-sm font-semibold uppercase tracking-wide">Pipeline</span>
-            </div>
-            
-            {/* Visual pipeline flow */}
-            <div className="space-y-4">
-              {/* Input stage */}
-              <div className="flex items-center gap-3">
-                <div className="flex gap-2">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                    <Activity className="w-5 h-5 text-blue-400" />
+          {/* Left: Stage List */}
+          <div className="lg:col-span-2 space-y-2">
+            {stages.map((stage) => {
+              const isActive = activeId === stage;
+              const info = stageDetails[stage];
+              const StageIcon = info.icon;
+
+              return (
+                <motion.div
+                  key={stage}
+                  onClick={() => setActiveId(stage)}
+                  whileHover={{ x: 4 }}
+                  className={`relative overflow-hidden cursor-pointer rounded-xl border transition-all duration-200 ${
+                    isActive 
+                      ? 'bg-zinc-900/80 border-zinc-700' 
+                      : 'bg-zinc-900/40 border-zinc-800/50 hover:bg-zinc-900/60 hover:border-zinc-700/50'
+                  }`}
+                >
+                  {/* Sidebar Indicator */}
+                  <div className={`absolute left-0 top-0 bottom-0 w-1 rounded-l-xl transition-all duration-200 ${
+                    isActive ? `bg-${info.color}-500` : `bg-${info.color}-500/20`
+                  }`} />
+
+                  <div className="p-4 flex items-center gap-3">
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center bg-${info.color}-500/20`}>
+                      <StageIcon className={`w-4 h-4 text-${info.color}-400`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className={`font-medium text-sm transition-colors ${isActive ? 'text-white' : 'text-zinc-400'}`}>
+                        {info.title}
+                      </h3>
+                      <p className="text-xs text-zinc-600 truncate">{info.subtitle}</p>
+                    </div>
+                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${
+                      isActive ? 'text-zinc-400 -rotate-90' : 'text-zinc-600 -rotate-90'
+                    }`} />
                   </div>
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-emerald-400" />
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Right: Detail Card */}
+          <div className="lg:col-span-3">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeId}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+                className="bg-zinc-900/60 border border-zinc-800/50 rounded-2xl p-6 h-full"
+              >
+                {/* Header */}
+                <div className="flex items-center gap-4 mb-6">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center bg-${activeInfo.color}-500/20`}>
+                    <activeInfo.icon className={`w-6 h-6 text-${activeInfo.color}-400`} />
                   </div>
-                  <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
-                    <Network className="w-5 h-5 text-purple-400" />
+                  <div>
+                    <h3 className="text-xl font-semibold text-white">{activeInfo.title}</h3>
+                    <p className="text-sm text-zinc-500">{activeInfo.subtitle}</p>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-zinc-600" />
-                <div className="flex-1 px-4 py-2 bg-zinc-900/50 rounded-lg border border-zinc-800">
-                  <p className="text-sm text-white font-medium">Multimodal Input</p>
-                  <p className="text-xs text-zinc-500">Metrics · Logs · Traces</p>
-                </div>
-              </div>
 
-              {/* TCN stage */}
-              <div className="flex items-center gap-3 pl-8">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
-                  <Layers className="w-5 h-5 text-amber-400" />
-                </div>
-                <ChevronRight className="w-4 h-4 text-zinc-600" />
-                <div className="flex-1 px-4 py-2 bg-zinc-900/50 rounded-lg border border-zinc-800">
-                  <p className="text-sm text-white font-medium">TCN Encoder</p>
-                  <p className="text-xs text-zinc-500">Depthwise separable · dilation [1,2]</p>
-                </div>
-              </div>
+                {/* Description */}
+                <p className="text-zinc-400 text-sm leading-relaxed mb-6 border-l-2 border-zinc-700 pl-4">
+                  Processing logic for <span className="text-white font-medium">{activeInfo.subtitle}</span>. 
+                  Optimized for high-dimensional throughput with minimal computational overhead.
+                </p>
 
-              {/* Fusion stage */}
-              <div className="flex items-center gap-3 pl-16">
-                <div className="w-10 h-10 rounded-xl bg-pink-500/20 flex items-center justify-center">
-                  <GitMerge className="w-5 h-5 text-pink-400" />
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 gap-3">
+                  {activeInfo.stats.map((stat, i) => (
+                    <motion.div 
+                      key={i}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                      className="bg-zinc-950/50 border border-zinc-800/50 p-4 rounded-xl hover:border-zinc-700/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <stat.icon className={`w-4 h-4 text-${stat.color}-400`} />
+                        <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">{stat.label}</span>
+                      </div>
+                      <div className="text-2xl font-bold text-white">
+                        {stat.value}
+                        {stat.unit && <span className="text-base text-zinc-500 ml-0.5">{stat.unit}</span>}
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-                <ChevronRight className="w-4 h-4 text-zinc-600" />
-                <div className="flex-1 px-4 py-2 bg-zinc-900/50 rounded-lg border border-zinc-800">
-                  <p className="text-sm text-white font-medium">Gated Fusion</p>
-                  <p className="text-xs text-zinc-500">Learned modality weights</p>
-                </div>
-              </div>
-
-              {/* Attention stage */}
-              <div className="flex items-center gap-3 pl-24">
-                <div className="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center">
-                  <Brain className="w-5 h-5 text-cyan-400" />
-                </div>
-                <ChevronRight className="w-4 h-4 text-zinc-600" />
-                <div className="flex-1 px-4 py-2 bg-zinc-900/50 rounded-lg border border-zinc-800">
-                  <p className="text-sm text-white font-medium">Cross-Service Attention</p>
-                  <p className="text-xs text-zinc-500">4 heads · PCMCI causal prior</p>
-                </div>
-              </div>
-
-              {/* Output */}
-              <div className="flex items-center gap-3 pl-32">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                  <Target className="w-5 h-5 text-emerald-400" />
-                </div>
-                <ChevronRight className="w-4 h-4 text-zinc-600" />
-                <div className="flex-1 px-4 py-3 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
-                  <p className="text-sm text-emerald-400 font-semibold">Root Cause Ranking</p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Parameters card */}
-          <motion.div
-            variants={itemVariants}
-            className="bento-card bento-card-accent p-6 flex flex-col justify-between"
-          >
-            <div className="w-12 h-12 rounded-2xl bg-blue-500/20 flex items-center justify-center mb-4">
-              <Layers className="w-6 h-6 text-blue-400" />
-            </div>
-            <div>
-              <h3 className="text-4xl font-bold text-white mb-1">324K</h3>
-              <p className="text-zinc-400 text-sm">Total Parameters</p>
-            </div>
-          </motion.div>
-
-          {/* Embedding card */}
-          <motion.div
-            variants={itemVariants}
-            className="bento-card p-6 flex flex-col justify-between"
-          >
-            <div className="w-12 h-12 rounded-2xl bg-purple-500/20 flex items-center justify-center mb-4">
-              <GitMerge className="w-6 h-6 text-purple-400" />
-            </div>
-            <div>
-              <h3 className="text-4xl font-bold text-white mb-1">128</h3>
-              <p className="text-zinc-400 text-sm">Embedding Dimension</p>
-            </div>
-          </motion.div>
-
-          {/* Modalities card */}
-          <motion.div
-            variants={itemVariants}
-            className="bento-card p-6"
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-emerald-400 text-sm font-semibold uppercase tracking-wide">Modalities</span>
-            </div>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-blue-400" />
-                  <span className="text-sm text-zinc-300">Metrics</span>
-                </div>
-                <span className="text-xs text-zinc-500 font-mono">64 features</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-emerald-400" />
-                  <span className="text-sm text-zinc-300">Logs</span>
-                </div>
-                <span className="text-xs text-zinc-500 font-mono">TF-IDF</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Network className="w-4 h-4 text-purple-400" />
-                  <span className="text-sm text-zinc-300">Traces</span>
-                </div>
-                <span className="text-xs text-zinc-500 font-mono">32 features</span>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Causal Prior card */}
-          <motion.div
-            variants={itemVariants}
-            className="bento-card p-6"
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-amber-400 text-sm font-semibold uppercase tracking-wide">Causal Prior</span>
-            </div>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-zinc-300">Method</span>
-                <span className="text-xs text-zinc-500 font-mono">PCMCI+</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-zinc-300">Injection λ</span>
-                <span className="text-xs text-zinc-500 font-mono">0.3</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-zinc-300">Max lag τ</span>
-                <span className="text-xs text-zinc-500 font-mono">5</span>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Training card */}
-          <motion.div
-            variants={itemVariants}
-            className="bento-card p-6 lg:col-span-2"
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-cyan-400 text-sm font-semibold uppercase tracking-wide">Training Config</span>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
-                <p className="text-2xl font-bold text-white">35%</p>
-                <p className="text-xs text-zinc-500">Dropout</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-white">32</p>
-                <p className="text-xs text-zinc-500">Hidden Dim</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-white">4</p>
-                <p className="text-xs text-zinc-500">Attn Heads</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-white">2</p>
-                <p className="text-xs text-zinc-500">TCN Blocks</p>
-              </div>
-            </div>
-          </motion.div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </motion.div>
       </div>
     </section>

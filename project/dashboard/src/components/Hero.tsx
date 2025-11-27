@@ -58,7 +58,7 @@ export function Hero() {
         >
           Multimodal deep learning that fuses metrics, logs, and traces to identify root causes.
           Achieving <span className="text-white font-medium">88.9% ensemble</span> accuracy (up to 92.6%) with{' '}
-          <span className="text-blue-400 font-medium">60-270× faster</span> inference than SOTA.
+          <span className="text-blue-400 font-medium">270× faster</span> inference than SOTA.
         </motion.p>
 
         {/* CTA Buttons */}
